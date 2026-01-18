@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router'
 import useUserStore from './store/useUserStore'
 import { useState } from 'react'
-import { Header } from './components'
+import { Footer, Header } from './components'
 
 function App() {
   const [isLoading, setIsLoading] = useState(false)
@@ -12,13 +12,13 @@ function App() {
     <h1>Loading...</h1>
   ) : (
     <>
-      <div>
-        <div>
+      <div >
+        <div >
           <Header />
           <main>
             <Outlet />
           </main>
-          <footer>Footer</footer>
+          <Footer />
         </div>
       </div>
     </>
