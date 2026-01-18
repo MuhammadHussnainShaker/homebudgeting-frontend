@@ -26,7 +26,7 @@ createRoot(root).render(
           {/* Public routes */}
           <Route element={<AuthLayout authenticationRequired={false} />}>
             <Route path='/signup' element={<Signup />} />
-            <Route path='/Login' element={<Login />} />
+            <Route path='/login' element={<Login />} />
           </Route>
 
           {/* Private routes */}

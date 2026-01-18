@@ -40,11 +40,6 @@ export default function Header() {
     },
   ]
 
-  navItems.map((item) =>
-    item.active ? console.log(item) : null,
-  )
-
-
   return (
     <header>
       <Container>

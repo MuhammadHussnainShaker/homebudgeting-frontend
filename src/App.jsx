@@ -1,16 +1,25 @@
-import { Outlet } from 'react-router'
+import { Outlet, useNavigate } from 'react-router'
 import useUserStore from './store/useUserStore'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Footer, Header } from './components'
 
 function App() {
-  const [isLoading, setIsLoading] = useState(false)
-  const userInfo = useUserStore((state) => state.user)
-  console.log('userInfo', userInfo)
+  // const [isLoading, setIsLoading] = useState(true)
+  // const userInfo = useUserStore((state) => state.user)
+  // console.log('userInfo', userInfo)
+  // const navigate = useNavigate()
 
-  return isLoading ? (
-    <h1>Loading...</h1>
-  ) : (
+  // useEffect(()=>{
+  //   if (userInfo.isAuthenticated) {
+  //     navigate('/dashboard')
+  //     setIsLoading(false)
+  //   } else {
+  //     navigate('/')
+  //     setIsLoading(false)
+  //   }
+  // },[])
+
+  return (
     <>
       <div >
         <div >
