@@ -1,7 +1,9 @@
+import {Login as LoginComponent} from '../components'
+
 export default function Login() {
   return (
-    <>
-      <h1>Login Page</h1>
-    </>
+    <div>
+      <LoginComponent />
+    </div>
   )
 }
