@@ -5,11 +5,14 @@ export default function Signup() {
   const [displayName, setDisplayName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
   const login = useUserStore((state) => state.login)
+
 
   async function handleSubmit(e) {
     e.preventDefault()
     setIsSubmitting(true)
+    setError("")
     
     try {
       const response = await fetch('/api/v1/users/register', {
@@ -24,7 +27,7 @@ export default function Signup() {
         }),
       })
       const data = await response.json()
-      console.log(data)
+      
       if (!response.ok || data.success === false) {
         throw new Error(data.message || 'Signup failed')
       }
@@ -35,13 +38,15 @@ export default function Signup() {
         'Following error occured while submitting signup form',
         error,
       )
-      alert(error?.message || 'An unexpected error occurred. Please try again.')
+      setError(error?.message)
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
+    <>
+    {error && <p>{error}</p>}
     <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor='displayName'>Name: </label>
@@ -73,5 +78,6 @@ export default function Signup() {
         {isSubmitting ? 'Signing up...' : 'Signup'}
       </button>
     </form>
+    </>
   )
 }
