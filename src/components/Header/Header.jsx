@@ -43,11 +43,11 @@ export default function Header() {
   return (
     <header>
       <Container>
-        <nav>
+        <nav className='flex'>
           <div>
             <Link to='/'>Home</Link>
           </div>
-          <ul>
+          <ul className='flex'>
             {navItems.map((item) =>
               item.active ? (
                 <li key={item.name}>
