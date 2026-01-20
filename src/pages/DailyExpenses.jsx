@@ -1,7 +1,9 @@
+import { DailyExpenses as DailyExpensesComponent } from "../components"
+
 export default function DailyExpenses() {
   return (
     <>
-      <h1>DailyExpenses Page</h1>
+      <DailyExpensesComponent />
     </>
   )
 }
