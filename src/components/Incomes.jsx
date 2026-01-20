@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import DataHeader from './DataHeader'
-import DataItem from './DataItem'
-import CreateDataItem from './CreateDataItem'
+import {DataHeader, DataItem, CreateDataItem} from './index'
 
 export default function Incomes() {
   const [incomes, setIncomes] = useState([])
@@ -53,12 +51,15 @@ export default function Incomes() {
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Creating income failed')
+        throw new Error(data.message || 'Creating income record failed')
       }
 
       setIncomes((prev) => [...prev, data.data])
     } catch (error) {
-      console.error('Following error occured while creating income:', error)
+      console.error(
+        'Following error occured while creating income record:',
+        error,
+      )
       setError(error?.message)
       throw error
     }
@@ -77,7 +78,7 @@ export default function Incomes() {
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Fetching incomes failed')
+        throw new Error(data.message || 'Updating income record failed')
       }
 
       setIncomes((prev) =>
@@ -88,7 +89,7 @@ export default function Incomes() {
           : [data.data, ...prev],
       )
     } catch (error) {
-      console.error('Following error occured while updaing income:', error)
+      console.error('Following error occured while updaing income record:', error)
       setError(error?.message)
       throw error
     }
@@ -111,7 +112,7 @@ export default function Incomes() {
 
       setIncomes((prev) => prev.filter((income) => income._id != id))
     } catch (error) {
-      console.error('Following error occured while deleting income:', error)
+      console.error('Following error occured while deleting income record:', error)
       setError(error?.message)
       throw error
     }

@@ -4,6 +4,10 @@ import Login from './Login'
 import Container from './container/Container'
 import Header from './Header/Header'
 import Footer from "./Footer/Footer";
+import DataHeader from './DataHeader'
+import DataItem from './DataItem'
+import CreateDataItem from './CreateDataItem'
 import Incomes from './Incomes'
+import Savings from './Savings'
 
-export { AuthLayout, Signup, Container, Header, Footer, Login, Incomes }
+export { AuthLayout, Signup, Container, Header, Footer, Login, Incomes, Savings, DataHeader, DataItem, CreateDataItem }

@@ -156,6 +156,7 @@ export default function DataItem({
               projMinusActual
                 ? toNumber(projAmount) - toNumber(actualAmount)
                 : toNumber(actualAmount) - toNumber(projAmount)
+                // TODO: Show + sign with positive difference
             }
             className='border-1'
             disabled
