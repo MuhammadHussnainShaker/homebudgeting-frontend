@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import {DataHeader, DataItem, CreateDataItem} from './index'
+import { DataHeader, DataItem, CreateDataItem } from './index'
 
 export default function Incomes() {
   const [incomes, setIncomes] = useState([])
@@ -89,7 +89,10 @@ export default function Incomes() {
           : [data.data, ...prev],
       )
     } catch (error) {
-      console.error('Following error occured while updaing income record:', error)
+      console.error(
+        'Following error occured while updating income record:',
+        error,
+      )
       setError(error?.message)
       throw error
     }
@@ -112,38 +115,47 @@ export default function Incomes() {
 
       setIncomes((prev) => prev.filter((income) => income._id != id))
     } catch (error) {
-      console.error('Following error occured while deleting income record:', error)
+      console.error(
+        'Following error occured while deleting income record:',
+        error,
+      )
       setError(error?.message)
       throw error
     }
   }
 
-  if (isLoading) {
-    return <h1>Loading...</h1>
-  }
+  if (isLoading) return <h1>Loading...</h1>
 
   return (
-    <>
-      <section>
-        <h2>Incomes</h2>
-        {error && <p>{error}</p>}
+    <section className='space-y-3'>
+      <div className='flex items-baseline justify-between gap-3'>
+        <h2 className='text-lg font-semibold'>Incomes</h2>
+      </div>
+
+      {error && <p className='text-sm text-red-600'>{error}</p>}
+
+      <div className='space-y-2'>
         <DataHeader sectionName={'Income'} />
-        {incomes.length > 0 &&
-          incomes.map((income, index) => (
-            <DataItem
-              id={income._id}
-              key={income._id}
-              index={index}
-              description={income.description}
-              projAmount={income.projectedAmount}
-              actualAmount={income.actualAmount}
-              projMinusActual={false}
-              updateRecordFn={updateIncome}
-              deleteRecordFn={deleteIncome}
-            />
-          ))}
+
+        <div className='space-y-2 sm:space-y-1'>
+          {incomes.length > 0 &&
+            incomes.map((income, index) => (
+              <DataItem
+                id={income._id}
+                key={income._id}
+                index={index}
+                description={income.description}
+                projAmount={income.projectedAmount}
+                actualAmount={income.actualAmount}
+                projMinusActual={false}
+                updateRecordFn={updateIncome}
+                deleteRecordFn={deleteIncome}
+              />
+            ))}
+        </div>
+
         <CreateDataItem createRecordFn={createIncome} />
-      </section>
-    </>
+      </div>
+    </section>
   )
 }
