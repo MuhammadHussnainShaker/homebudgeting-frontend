@@ -12,6 +12,7 @@ export default function Incomes() {
     async function fetchIncomes() {
       try {
         const response = await fetch(
+          // TODO: create global month variable and fetch data from there and replace here
           '/api/v1/incomes/2026-01-01T00:00:00.000Z',
           {
             method: 'GET',
@@ -55,13 +56,11 @@ export default function Incomes() {
         throw new Error(data.message || 'Creating income failed')
       }
 
-      setIncomes((prev) => [data.data, ...prev])
+      setIncomes((prev) => [...prev, data.data])
     } catch (error) {
-      console.error('Following error occured while creating income', error)
+      console.error('Following error occured while creating income:', error)
       setError(error?.message)
       throw error
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -89,37 +88,60 @@ export default function Incomes() {
           : [data.data, ...prev],
       )
     } catch (error) {
-      console.error('Following error occured while fetching incomes', error)
+      console.error('Following error occured while updaing income:', error)
       setError(error?.message)
       throw error
-    } finally {
-      // setIsLoading(false)
     }
   }
 
-  // TODO: deleteIncome
+  async function deleteIncome(id) {
+    try {
+      const response = await fetch(`/api/v1/incomes/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = await response.json()
+
+      if (!response.ok || data.success === false) {
+        throw new Error(data.message || 'Deleting income record failed')
+      }
+
+      setIncomes((prev) => prev.filter((income) => income._id != id))
+    } catch (error) {
+      console.error('Following error occured while deleting income:', error)
+      setError(error?.message)
+      throw error
+    }
+  }
 
   if (isLoading) {
     return <h1>Loading...</h1>
   }
+
   return (
     <>
       <section>
-        <h2>Incomes Component</h2>
+        <h2>Incomes</h2>
         {error && <p>{error}</p>}
         <DataHeader sectionName={'Income'} />
         {incomes.length > 0 &&
-          incomes.map((income) => (
+          incomes.map((income, index) => (
             <DataItem
               id={income._id}
               key={income._id}
+              index={index}
               description={income.description}
-              projectedAmount={income.projectedAmount}
+              projAmount={income.projectedAmount}
               actualAmount={income.actualAmount}
-              updateIncome={updateIncome}
+              projMinusActual={false}
+              updateRecordFn={updateIncome}
+              deleteRecordFn={deleteIncome}
             />
           ))}
-        <CreateDataItem createIncome={createIncome} />
+        <CreateDataItem createRecordFn={createIncome} />
       </section>
     </>
   )

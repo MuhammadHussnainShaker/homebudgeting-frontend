@@ -2,25 +2,27 @@ import { useEffect, useState } from 'react'
 
 export default function DataItem({
   id,
+  index = 0,
   description: initialDescription = '',
-  projectedAmount: initialProjectedAmount = 0,
+  projAmount: initialProjAmount = 0,
   actualAmount: initialActualAmount = 0,
-  updateIncome,
+  projMinusActual = true,
+  updateRecordFn,
+  deleteRecordFn,
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState(initialDescription)
-  const [projectedAmount, setProjectedAmount] = useState(
-    String(initialProjectedAmount),
-  )
+  const [projAmount, setProjectedAmount] = useState(String(initialProjAmount))
   const [actualAmount, setActualAmount] = useState(String(initialActualAmount))
 
   // KEEP LOCAL STATE IN SYNC WITH PARENT/PROPS TODO: UNDERSTAND IT
   useEffect(() => {
     setDescription(initialDescription)
-    setProjectedAmount(String(initialProjectedAmount))
+    setProjectedAmount(String(initialProjAmount))
     setActualAmount(String(initialActualAmount))
-  }, [initialDescription, initialProjectedAmount, initialActualAmount])
+  }, [initialDescription, initialProjAmount, initialActualAmount])
 
+  // Convert string to number
   function toNumber(value) {
     const n = parseFloat(value)
     return Number.isFinite(n) ? n : 0
@@ -28,26 +30,46 @@ export default function DataItem({
 
   async function handleBlur() {
     const trimmedDesc = description.trim()
-    const projectedValue = toNumber(projectedAmount)
+    const projectedValue = toNumber(projAmount)
     const actualValue = toNumber(actualAmount)
 
+    // Delete record if description is empty
+    if (trimmedDesc === '') {
+      const deleteRecord = confirm(
+        'Empty description will delete this record! Do you want to proceed?',
+      )
+      if (deleteRecord) {
+        try {
+          await deleteRecordFn(id)
+        } catch (error) {
+          setDescription(initialDescription)
+          setProjectedAmount(String(initialProjAmount))
+          setActualAmount(String(initialActualAmount))
+          alert('Failed to delete. Reverting changes.')
+        } finally {
+          setIsSubmitting(false)
+        }
+        return
+      }
+    }
     const body = {}
-
     if (trimmedDesc !== initialDescription) body.description = trimmedDesc
-    if (projectedValue !== initialProjectedAmount)
+    if (projectedValue !== initialProjAmount)
       body.projectedAmount = projectedValue
     if (actualValue !== initialActualAmount) body.actualAmount = actualValue
 
+    // Return if body object is empty, nothing to update
     if (Object.keys(body).length == 0) return
 
+    // Try to update record
     setIsSubmitting(true)
     try {
-      await updateIncome(id, body)
+      await updateRecordFn(id, body)
     } catch (error) {
       setDescription(initialDescription)
-      setProjectedAmount(String(initialProjectedAmount))
+      setProjectedAmount(String(initialProjAmount))
       setActualAmount(String(initialActualAmount))
-      alert('Failed to save. Reverting changes.')
+      alert('Failed to update. Reverting changes.')
     } finally {
       setIsSubmitting(false)
     }
@@ -58,14 +80,18 @@ export default function DataItem({
       e.target.blur()
     } else if (e.key === 'Escape') {
       setDescription(initialDescription)
-      setProjectedAmount(String(initialProjectedAmount))
+      setProjectedAmount(String(initialProjAmount))
       setActualAmount(String(initialActualAmount))
     }
   }
 
+  // TODO: handle TAB press
+  // TODO: handle focus on newly created record's description
+
   return (
     <>
       <div className='flex justify-between'>
+        <div>{index + 1}</div>
         <div className='relative flex items-center'>
           <input
             type='text'
@@ -90,14 +116,14 @@ export default function DataItem({
             type='number'
             name='projectedAmount'
             id='projectedAmount'
-            value={projectedAmount}
+            value={projAmount}
             onChange={(e) => setProjectedAmount(e.target.value)}
             className='border-1'
             disabled={isSubmitting}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />
-          {isSubmitting && projectedAmount != initialProjectedAmount && (
+          {isSubmitting && projAmount != initialProjAmount && (
             <div className='absolute right-2'>
               <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
             </div>
@@ -126,7 +152,11 @@ export default function DataItem({
             type='number'
             name='difference'
             id='difference'
-            value={toNumber(projectedAmount) - toNumber(actualAmount)}
+            value={
+              projMinusActual
+                ? toNumber(projAmount) - toNumber(actualAmount)
+                : toNumber(actualAmount) - toNumber(projAmount)
+            }
             className='border-1'
             disabled
           />

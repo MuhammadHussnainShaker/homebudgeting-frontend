@@ -1,31 +1,23 @@
 import { useState } from 'react'
 
-export default function CreateDataItem({ createIncome }) {
+export default function CreateDataItem({ createRecordFn }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState('')
 
-  function toNumber(value) {
-    const n = parseFloat(value)
-    return Number.isFinite(n) ? n : 0
-  }
-
   async function handleBlur() {
     const trimmedDesc = description.trim()
-
     const body = {}
-
     if (trimmedDesc !== '') body.description = trimmedDesc
-
     if (Object.keys(body).length == 0) return
 
-    body.month = new Date().toISOString()
-
+    // Try to create record
     setIsSubmitting(true)
+    body.month = new Date().toISOString()
     try {
-      await createIncome(body)
+      await createRecordFn(body)
       setDescription('')
     } catch (error) {
-      alert('Failed to save. Please try again.')
+      alert('Failed to create record. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -42,6 +34,7 @@ export default function CreateDataItem({ createIncome }) {
   return (
     <>
       <div className='flex justify-between'>
+        <div>+</div>
         <div className='relative flex items-center'>
           <input
             type='text'
@@ -61,7 +54,7 @@ export default function CreateDataItem({ createIncome }) {
             </div>
           )}
         </div>
-        <div className='relative flex items-center'>
+        <div>
           <input
             type='number'
             name='createProjectedAmount'
@@ -70,7 +63,7 @@ export default function CreateDataItem({ createIncome }) {
             disabled
           />
         </div>
-        <div className='relative flex items-center'>
+        <div>
           <input
             type='number'
             name='createActualAmount'
