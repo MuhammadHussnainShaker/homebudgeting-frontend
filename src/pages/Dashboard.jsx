@@ -1,11 +1,13 @@
-import { Incomes, Savings } from '../components'
+import { Incomes, Savings, MonthlyExpenses, Container } from '../components'
 
 export default function Dashboard() {
   return (
     <>
       <h1>Dashborad Page</h1>
-      <Incomes />
-      <Savings />
+      <Container>
+        <Incomes />
+        <Savings />
+      </Container>
     </>
   )
 }

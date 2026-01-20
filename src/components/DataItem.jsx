@@ -7,6 +7,7 @@ export default function DataItem({
   projAmount: initialProjAmount = 0,
   actualAmount: initialActualAmount = 0,
   projMinusActual = true,
+  isActualDisabled = false,
   updateRecordFn,
   deleteRecordFn,
 }) {
@@ -133,8 +134,6 @@ export default function DataItem({
           <div className='relative flex items-center'>
             <input
               type='number'
-              inputMode='decimal'
-              step='0.01'
               name={`projectedAmount-${id}`}
               id={`projectedAmount-${id}`}
               value={projAmount}
@@ -159,14 +158,12 @@ export default function DataItem({
           <div className='relative flex items-center'>
             <input
               type='number'
-              inputMode='decimal'
-              step='0.01'
               name={`actualAmount-${id}`}
               id={`actualAmount-${id}`}
               value={actualAmount}
               onChange={(e) => setActualAmount(e.target.value)}
               className={inputBase}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isActualDisabled}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
             />

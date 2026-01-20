@@ -9,5 +9,6 @@ import DataItem from './DataItem'
 import CreateDataItem from './CreateDataItem'
 import Incomes from './Incomes'
 import Savings from './Savings'
+import MonthlyExpenses from './MonthlyExpenses'
 
-export { AuthLayout, Signup, Container, Header, Footer, Login, Incomes, Savings, DataHeader, DataItem, CreateDataItem }
+export { AuthLayout, Signup, Container, Header, Footer, Login, Incomes, Savings, DataHeader, DataItem, CreateDataItem, MonthlyExpenses }

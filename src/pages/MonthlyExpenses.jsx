@@ -1,7 +1,10 @@
+import { MonthlyExpenses as MonthlyExpensesComponent, Container } from '../components'
 export default function MonthlyExpenses() {
   return (
     <>
-      <h1>MonthlyExpenses Page</h1>
+      <Container>
+        <MonthlyExpensesComponent />
+      </Container>
     </>
   )
 }

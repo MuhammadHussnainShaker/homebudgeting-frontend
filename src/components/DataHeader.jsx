@@ -15,7 +15,7 @@ export default function DataHeader({
       <div className='sm:col-span-5'>{sectionName}</div>
       <div className='sm:col-span-2'>Projected</div>
       <div className='sm:col-span-2'>Actual</div>
-      <div className='sm:col-span-2'>Diff</div>
+      <div className='sm:col-span-2'>Difference</div>
     </div>
   )
 }

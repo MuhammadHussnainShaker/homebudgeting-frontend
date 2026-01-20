@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function CreateDataItem({ createRecordFn }) {
+export default function CreateDataItem({ createRecordFn, parentId = "" }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState('')
 
@@ -13,6 +13,7 @@ export default function CreateDataItem({ createRecordFn }) {
     // Try to create record
     setIsSubmitting(true)
     body.month = new Date().toISOString()
+    if (parentId) body.parentId = parentId
     try {
       await createRecordFn(body)
       setDescription('')
