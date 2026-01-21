@@ -12,6 +12,14 @@ export default function SelectableCheckbox({
 
   const onChange = async (e) => {
     const newVal = e.target.checked
+    
+    if (newVal === false) {
+      const proceed = confirm(
+        '"Do you really want to make this category un-selectable? This action will move all of your daily expenses having this category to others category. Proceed with caution!"',
+      )
+      if (!proceed) return
+    }
+    
     setSelectable(newVal)
     setIsSubmitting(true)
     try {
@@ -23,6 +31,7 @@ export default function SelectableCheckbox({
       setIsSubmitting(false)
     }
   }
+
   return (
     <>
       <label className='sm:hidden mb-1 block text-xs text-gray-500'>

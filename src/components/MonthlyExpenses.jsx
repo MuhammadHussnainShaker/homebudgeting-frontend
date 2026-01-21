@@ -6,6 +6,7 @@ export default function MonthlyExpenses() {
   const [monthlyCatExpenses, setMonthlyCatExpenses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const month = '2026-01-01T00:00:00.000Z'
 
   useEffect(() => {
     async function fetchParentCategories() {
@@ -150,7 +151,7 @@ export default function MonthlyExpenses() {
   async function toggleSelectableFn(id, body) {
     try {
       const response = await fetch(
-        `/api/v1/monthly-categorical-expenses/${id}/toggle-selectable`,
+        `/api/v1/monthly-categorical-expenses/${id}/toggle-selectable/${month}`,
         {
           method: 'PATCH',
           credentials: 'include',
@@ -160,6 +161,14 @@ export default function MonthlyExpenses() {
           body: JSON.stringify(body),
         },
       )
+
+      // TODO: fix error failed to execute .json
+      // if (!response.ok) {
+      //   throw new Error(
+      //     'Toggling monthly-categorical-expense record selectable failed',
+      //   )
+      // }
+
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
@@ -169,7 +178,7 @@ export default function MonthlyExpenses() {
         )
       }
 
-      setMonthlyCatExpenses((prev) => 
+      setMonthlyCatExpenses((prev) =>
         prev.some((expense) => expense._id === data.data._id)
           ? prev.map((expense) =>
               expense._id === data.data._id ? data.data : expense,
