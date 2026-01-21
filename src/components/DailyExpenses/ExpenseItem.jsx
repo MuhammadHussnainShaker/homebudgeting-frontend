@@ -1,21 +1,25 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 
 export default function ExpenseItem({
   id,
   index = 0,
   description: initialDescription = '',
   amount: initialAmount = 0,
+  selectableCategories = [],
+  categoryId: initialCategoryId,
   updateRecordFn,
   deleteRecordFn,
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState(initialDescription)
   const [amount, setAmount] = useState(String(initialAmount))
+  const [categoryId, setCategoryId] = useState(initialCategoryId ?? '')
 
   useEffect(() => {
     setDescription(initialDescription)
     setAmount(String(initialAmount))
-  }, [initialDescription, initialAmount])
+    setCategoryId(initialCategoryId ?? '')
+  }, [initialDescription, initialAmount, initialCategoryId])
 
   // Convert string to number
   function toNumber(value) {
@@ -38,6 +42,7 @@ export default function ExpenseItem({
         } catch (error) {
           setDescription(initialDescription)
           setAmount(String(initialAmount))
+          setCategoryId(initialCategoryId ?? '')
           alert('Failed to delete. Reverting changes.')
         } finally {
           setIsSubmitting(false)
@@ -50,8 +55,13 @@ export default function ExpenseItem({
     if (trimmedDesc !== initialDescription) body.description = trimmedDesc
     if (amountInNum !== initialAmount) body.amount = amountInNum
 
+    const initialCat = initialCategoryId ?? ''
+    if (categoryId !== initialCat) {
+      body.monthlyCategoricalExpenseId = categoryId === '' ? null : categoryId
+    }
+
     // Return if body object is empty, nothing to update
-    if (Object.keys(body).length == 0) return
+    if (Object.keys(body).length === 0) return
 
     // Try to update record
     setIsSubmitting(true)
@@ -60,6 +70,7 @@ export default function ExpenseItem({
     } catch (error) {
       setDescription(initialDescription)
       setAmount(String(initialAmount))
+      setCategoryId(initialCategoryId ?? '')
       alert('Failed to update. Reverting changes.')
     } finally {
       setIsSubmitting(false)
@@ -71,6 +82,7 @@ export default function ExpenseItem({
     else if (e.key === 'Escape') {
       setDescription(initialDescription)
       setAmount(String(initialAmount))
+      setCategoryId(initialCategoryId ?? '')
     }
   }
 
@@ -136,12 +148,27 @@ export default function ExpenseItem({
         </div>
 
         <div className='categoryContainer'>
-          <select name='category' id='category'>
+          <select
+            name={`category-${id}`}
+            id={`category-${id}`}
+            value={categoryId ?? ''}
+            onChange={(e) => setCategoryId(e.target.value)}
+            disabled={isSubmitting}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+          >
             <option value=''>--Please choose an option--</option>
-            <option value='health'>Health Expenses</option>
-            <option value='home'>Home Expenses</option>
-            <option value='travel'>Travel Expenses</option>
-            <option value='food'>Food & Dining</option>
+            {selectableCategories.length > 0 ? (
+              selectableCategories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.description}
+                </option>
+              ))
+            ) : (
+              <option value='' disabled>
+                --No category is made selectable from monthly expenses--
+              </option>
+            )}
           </select>
         </div>
       </div>

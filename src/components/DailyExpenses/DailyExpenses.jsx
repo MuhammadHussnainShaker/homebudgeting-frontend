@@ -5,15 +5,13 @@ import CreateExpenseItem from './CreateExpenseItem'
 export default function DailyExpenses() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [dailyExpenses, setDailyExpenses] = useState([])
+  const [selectableCategories, setSelectableCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // TODO: refetch when data change
-  // fetch categories whose selectable is true
-  // allow to send id of that categories with update as monthlyCategExpId
-
   useEffect(() => {
     async function fetchDailyExpenses() {
+      setIsLoading(true)
       try {
         const response = await fetch(
           // localhost:8081/api/v1/daily-expense?date=2026-07-01&month=2026-01
@@ -32,7 +30,8 @@ export default function DailyExpenses() {
           throw new Error(data.message || 'Fetching daily-expenses failed')
         }
 
-        setDailyExpenses(data.data)
+        setDailyExpenses(data.data.dailyExpenses)
+        setSelectableCategories(data.data.selectableCategoricalExpenses)
       } catch (error) {
         console.error(
           'Following error occured while fetching daily-expenses',
@@ -45,7 +44,7 @@ export default function DailyExpenses() {
     }
 
     fetchDailyExpenses()
-  }, [])
+  }, [date])
 
   async function createDailyExpense(body) {
     try {
@@ -168,6 +167,8 @@ export default function DailyExpenses() {
                 amount={expense.amount}
                 updateRecordFn={updateDailyExpense}
                 deleteRecordFn={deleteDailyExpense}
+                selectableCategories={selectableCategories}
+                categoryId={expense.monthlyCategoricalExpenseId}
               />
             ))}
         </div>
