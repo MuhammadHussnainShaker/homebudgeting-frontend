@@ -56,6 +56,20 @@ export default function DailyExpenses() {
         },
         body: JSON.stringify(body),
       })
+
+      if (!response.ok) {
+        const text = await response.text() // safe even if empty or not JSON
+        let message = response.statusText || 'Request failed'
+        try {
+          const errJson = text ? JSON.parse(text) : null
+          message = errJson?.message ?? errJson?.error ?? message
+        } catch (e) {
+          // not JSON, use plain text
+          message = text || message
+        }
+        throw new Error(message)
+      }
+      
       const data = await response.json()
 
       if (!response.ok || data.success === false) {

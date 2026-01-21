@@ -13,7 +13,7 @@ export default function DataHeader({
       ].join(' ')}
     >
       <div className='sm:col-span-1'>#</div>
-      <div className='sm:col-span-2'>{sectionName}</div>
+      <div className='sm:col-span-3'>{sectionName}</div>
       <div className='sm:col-span-2'>Projected</div>
       <div className='sm:col-span-2'>Actual</div>
       <div className='sm:col-span-2'>Difference</div>

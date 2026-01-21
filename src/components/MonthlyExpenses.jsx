@@ -40,6 +40,7 @@ export default function MonthlyExpenses() {
       }
     }
 
+    // calculate totals for categories where selectable is true
     async function fetchMonthlyCategoricalExpenses() {
       try {
         const response = await fetch(

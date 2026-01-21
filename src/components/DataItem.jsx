@@ -107,7 +107,7 @@ export default function DataItem({
           <div className='sm:hidden text-xs text-gray-500'>Item</div>
         </div>
 
-        <div className='sm:col-span-5'>
+        <div className='sm:col-span-3'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Description
           </label>
@@ -131,7 +131,7 @@ export default function DataItem({
           </div>
         </div>
 
-        <div className='sm:col-span-1'>
+        <div className='sm:col-span-2'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Projected Amount
           </label>
@@ -155,7 +155,7 @@ export default function DataItem({
           </div>
         </div>
 
-        <div className='sm:col-span-1'>
+        <div className='sm:col-span-2'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Actual Amount
           </label>
@@ -179,7 +179,7 @@ export default function DataItem({
           </div>
         </div>
 
-        <div className='sm:col-span-1'>
+        <div className='sm:col-span-2'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Difference
           </label>
