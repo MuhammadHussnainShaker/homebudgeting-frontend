@@ -147,6 +147,45 @@ export default function MonthlyExpenses() {
     }
   }
 
+  async function toggleSelectableFn(id, body) {
+    try {
+      const response = await fetch(
+        `/api/v1/monthly-categorical-expenses/${id}/toggle-selectable`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        },
+      )
+      const data = await response.json()
+
+      if (!response.ok || data.success === false) {
+        throw new Error(
+          data.message ||
+            'Toggling monthly-categorical-expense record selectable failed',
+        )
+      }
+
+      setMonthlyCatExpenses((prev) => 
+        prev.some((expense) => expense._id === data.data._id)
+          ? prev.map((expense) =>
+              expense._id === data.data._id ? data.data : expense,
+            )
+          : [data.data, ...prev],
+      )
+    } catch (error) {
+      console.error(
+        'Following error occured while toggling monthly-categorical-expense record selectable:',
+        error,
+      )
+      setError(error?.message)
+      throw error
+    }
+  }
+
   async function deleteMonthlyCategoricalExpense(id) {
     try {
       const response = await fetch(
@@ -167,7 +206,9 @@ export default function MonthlyExpenses() {
         )
       }
 
-      setMonthlyCatExpenses((prev) => prev.filter((expense) => expense._id != id))
+      setMonthlyCatExpenses((prev) =>
+        prev.filter((expense) => expense._id != id),
+      )
     } catch (error) {
       console.error(
         'Following error occured while deleting monthly-categorical-expenses record:',
@@ -192,7 +233,10 @@ export default function MonthlyExpenses() {
           )
           return (
             <React.Fragment key={parentCategory._id}>
-              <DataHeader sectionName={parentCategory.description} />
+              <DataHeader
+                sectionName={parentCategory.description}
+                showSelectable={true}
+              />
               {relevantExpenses.length === 0 && (
                 <p>No expenses recorded for this category.</p>
               )}
@@ -207,6 +251,9 @@ export default function MonthlyExpenses() {
                     actualAmount={expense.actualAmount}
                     projMinusActual={true}
                     isActualDisabled={expense.selectable}
+                    showSelectable={true}
+                    initialSelectable={expense.selectable}
+                    toggleSelectableFn={toggleSelectableFn}
                     deleteRecordFn={deleteMonthlyCategoricalExpense}
                     updateRecordFn={updateMonthlyCategoricalExpense}
                   />

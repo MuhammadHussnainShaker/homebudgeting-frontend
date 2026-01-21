@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import SelectableCheckbox from './MonthlyExpenses/SelectableCheckbox'
 
 export default function DataItem({
   id,
@@ -8,8 +9,11 @@ export default function DataItem({
   actualAmount: initialActualAmount = 0,
   projMinusActual = true,
   isActualDisabled = false,
-  updateRecordFn,
-  deleteRecordFn,
+  showSelectable = false,
+  initialSelectable = false,
+  toggleSelectableFn = async () => {},
+  updateRecordFn = async () => {},
+  deleteRecordFn = async () => {},
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState(initialDescription)
@@ -127,7 +131,7 @@ export default function DataItem({
           </div>
         </div>
 
-        <div className='sm:col-span-2'>
+        <div className='sm:col-span-1'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Projected Amount
           </label>
@@ -151,7 +155,7 @@ export default function DataItem({
           </div>
         </div>
 
-        <div className='sm:col-span-2'>
+        <div className='sm:col-span-1'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Actual Amount
           </label>
@@ -175,7 +179,7 @@ export default function DataItem({
           </div>
         </div>
 
-        <div className='sm:col-span-2'>
+        <div className='sm:col-span-1'>
           <label className='sm:hidden mb-1 block text-xs text-gray-500'>
             Difference
           </label>
@@ -188,6 +192,11 @@ export default function DataItem({
             disabled
           />
         </div>
+        {showSelectable && (
+          <div className='sm:col-span-1'>
+            <SelectableCheckbox id={id} initialSelectable={initialSelectable} toggleSelectableFn={toggleSelectableFn} />
+          </div>
+        )}
       </div>
     </div>
   )
