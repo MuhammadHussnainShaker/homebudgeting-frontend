@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { CreateDataItem, DataHeader, DataItem } from './index'
 
 export default function MonthlyExpenses() {
@@ -8,11 +8,41 @@ export default function MonthlyExpenses() {
   const [error, setError] = useState('')
   const month = '2026-01-01T00:00:00.000Z'
 
+  // Totals per parent category + grand total (derived state; no setState to avoid re-render loops)
+  const totals = useMemo(() => {
+    const byParent = Object.create(null)
+    const grand = { projTotal: 0, actTotal: 0, difference: 0 }
+
+    for (const exp of monthlyCatExpenses) {
+      const parentKey = String(exp.parentId ?? '')
+
+      if (!byParent[parentKey]) {
+        byParent[parentKey] = { projTotal: 0, actTotal: 0, difference: 0 }
+      }
+
+      const proj = Number(exp.projectedAmount) || 0
+      const act = Number(exp.actualAmount) || 0
+
+      byParent[parentKey].projTotal += proj
+      byParent[parentKey].actTotal += act
+
+      grand.projTotal += proj
+      grand.actTotal += act
+    }
+
+    // difference for expenses: projected - actual
+    for (const key of Object.keys(byParent)) {
+      byParent[key].difference = byParent[key].projTotal - byParent[key].actTotal
+    }
+    grand.difference = grand.projTotal - grand.actTotal
+
+    return { byParent, grand }
+  }, [monthlyCatExpenses])
+
   useEffect(() => {
     async function fetchParentCategories() {
       try {
         const response = await fetch(
-          // TODO: create global month variable and fetch data from there and replace here
           '/api/v1/parent-categories/2026-01-01T00:00:00.000Z',
           {
             method: 'GET',
@@ -40,11 +70,9 @@ export default function MonthlyExpenses() {
       }
     }
 
-    // calculate totals for categories where selectable is true
     async function fetchMonthlyCategoricalExpenses() {
       try {
         const response = await fetch(
-          // TODO: create global month variable and fetch data from there and replace here
           '/api/v1/monthly-categorical-expenses/2026-01-01T00:00:00.000Z',
           {
             method: 'GET',
@@ -80,18 +108,14 @@ export default function MonthlyExpenses() {
 
   async function createMonthlyCategoricalExpenses(body) {
     try {
-      const response = await fetch(
-        // TODO: create global month variable and fetch data from there and replace here
-        '/api/v1/monthly-categorical-expenses/',
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
+      const response = await fetch('/api/v1/monthly-categorical-expenses/', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+        body: JSON.stringify(body),
+      })
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
@@ -163,13 +187,6 @@ export default function MonthlyExpenses() {
         },
       )
 
-      // TODO: fix error failed to execute .json
-      // if (!response.ok) {
-      //   throw new Error(
-      //     'Toggling monthly-categorical-expense record selectable failed',
-      //   )
-      // }
-
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
@@ -217,7 +234,7 @@ export default function MonthlyExpenses() {
       }
 
       setMonthlyCatExpenses((prev) =>
-        prev.filter((expense) => expense._id != id),
+        prev.filter((expense) => expense._id !== id),
       )
     } catch (error) {
       console.error(
@@ -235,21 +252,33 @@ export default function MonthlyExpenses() {
     <section>
       <div className='text-center'>MonthlyExpenses</div>
       {error && <p className='text-sm text-red-600'>{error}</p>}
+
+      {parentCategories.length === 0 && <p>No categories available.</p>}
+
       {parentCategories.length > 0 &&
-        monthlyCatExpenses.length > 0 &&
         parentCategories.map((parentCategory) => {
           const relevantExpenses = monthlyCatExpenses.filter(
-            (expense) => expense.parentId == parentCategory._id,
+            (expense) => String(expense.parentId) === String(parentCategory._id),
           )
+
+          const parentTotals =
+            totals.byParent[String(parentCategory._id)] ?? {
+              projTotal: 0,
+              actTotal: 0,
+              difference: 0,
+            }
+
           return (
             <React.Fragment key={parentCategory._id}>
               <DataHeader
                 sectionName={parentCategory.description}
                 showSelectable={true}
               />
+
               {relevantExpenses.length === 0 && (
                 <p>No expenses recorded for this category.</p>
               )}
+
               {relevantExpenses.length > 0 &&
                 relevantExpenses.map((expense, index) => (
                   <DataItem
@@ -268,13 +297,36 @@ export default function MonthlyExpenses() {
                     updateRecordFn={updateMonthlyCategoricalExpense}
                   />
                 ))}
+
               <CreateDataItem
                 createRecordFn={createMonthlyCategoricalExpenses}
                 parentId={parentCategory._id}
               />
+
+              {/* Per-parent totals */}
+              <div className='mt-2 text-sm text-gray-700'>
+                <div className='flex flex-wrap gap-x-6 gap-y-1'>
+                  <span className='font-medium'>Total</span>
+                  <span>Projected: {parentTotals.projTotal}</span>
+                  <span>Actual: {parentTotals.actTotal}</span>
+                  <span>Difference: {parentTotals.difference}</span>
+                </div>
+              </div>
             </React.Fragment>
           )
         })}
+
+      {/* Grand total across all parent categories */}
+      {parentCategories.length > 0 && (
+        <div className='mt-6 border-t pt-3 text-sm text-gray-800'>
+          <div className='flex flex-wrap gap-x-6 gap-y-1'>
+            <span className='font-semibold'>Grand Total</span>
+            <span>Projected: {totals.grand.projTotal}</span>
+            <span>Actual: {totals.grand.actTotal}</span>
+            <span>Difference: {totals.grand.difference}</span>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

@@ -5,6 +5,9 @@ export default function Incomes() {
   const [incomes, setIncomes] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [totalProjAmount, setTotalProjAmount] = useState(0)
+  const [totalActAmount, setTotalActAmount] = useState(0)
+  const [totalDifference, setTotalDifference] = useState(0)
 
   useEffect(() => {
     async function fetchIncomes() {
@@ -37,6 +40,22 @@ export default function Incomes() {
 
     fetchIncomes()
   }, [])
+
+  // useEffect to calculate
+  // this useEffect to only run when incomes array is changed
+  useEffect(() => {
+    const { projTotal, actTotal } = incomes.reduce(
+      (acc, inc) => {
+        acc.projTotal += Number(inc.projectedAmount) || 0
+        acc.actTotal += Number(inc.actualAmount) || 0
+        return acc
+      },
+      { projTotal: 0, actTotal: 0 },
+    )
+    setTotalProjAmount(projTotal)
+    setTotalActAmount(actTotal)
+    setTotalDifference(actTotal - projTotal)
+  }, [incomes])
 
   async function createIncome(body) {
     try {
@@ -155,6 +174,48 @@ export default function Incomes() {
         </div>
 
         <CreateDataItem createRecordFn={createIncome} />
+        <div className=''>
+          <div className=''>
+            -
+          </div>
+
+          <div className=''>
+            <label className='sm:hidden mb-1 block text-xs text-gray-500'>
+            </label>
+            <div className='relative flex items-center'>
+              <input
+                type='text'
+                name='createDescription'
+                id='createDescription'
+                value={'Total'}
+                onChange={(e) => {}}
+                className={''}
+                disabled={true}
+              />
+            </div>
+          </div>
+
+          <div className='sm:col-span-2'>
+            <label className='sm:hidden mb-1 block text-xs text-gray-500'>
+              Projected Amount
+            </label>
+            <input value={totalProjAmount} disabled />
+          </div>
+
+          <div className='sm:col-span-2'>
+            <label className='sm:hidden mb-1 block text-xs text-gray-500'>
+              Actual Amount
+            </label>
+            <input value={totalActAmount} disabled />
+          </div>
+
+          <div className='sm:col-span-2'>
+            <label className='sm:hidden mb-1 block text-xs text-gray-500'>
+              Difference
+            </label>
+            <input value={totalDifference} disabled />
+          </div>
+        </div>
       </div>
     </section>
   )

@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ExpenseItem from './ExpenseItem'
 import CreateExpenseItem from './CreateExpenseItem'
 
 export default function DailyExpenses() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [dailyExpenses, setDailyExpenses] = useState([])
+  // derived total (no extra state)
+  const totals = useMemo(() => {
+    const totalAmount = dailyExpenses.reduce(
+      (sum, exp) => sum + (Number(exp.amount) || 0),
+      0,
+    )
+    return { totalAmount }
+  }, [dailyExpenses])
   const [selectableCategories, setSelectableCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -187,6 +195,11 @@ export default function DailyExpenses() {
             ))}
         </div>
         <CreateExpenseItem createRecordFn={createDailyExpense} date={date} />
+
+        {/* Totals */}
+        <div className='mt-4 text-sm font-semibold text-gray-800'>
+          <span>Total: {totals.totalAmount}</span>
+        </div>
       </div>
     </section>
   )
