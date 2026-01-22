@@ -12,14 +12,14 @@ export default function SelectableCheckbox({
 
   const onChange = async (e) => {
     const newVal = e.target.checked
-    
-    if (newVal === false) {
-      const proceed = confirm(
-        '"Do you really want to make this category un-selectable? This action will move all of your daily expenses having this category to others category. Proceed with caution!"',
-      )
-      if (!proceed) return
-    }
-    
+
+    const proceed = confirm(
+      newVal
+        ? 'Do you really want to make this category selectable? This action will clear the actual amount value of this category and actual amount will be calculated from daily expenses having this category. Proceed with caution!'
+        : 'Do you really want to make this category un-selectable? This action will move all of your daily expenses having this category to others category. Proceed with caution!',
+    )
+    if (!proceed) return
+
     setSelectable(newVal)
     setIsSubmitting(true)
     try {

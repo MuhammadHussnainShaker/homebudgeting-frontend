@@ -180,11 +180,11 @@ export default function MonthlyExpenses() {
       }
 
       setMonthlyCatExpenses((prev) =>
-        prev.some((expense) => expense._id === data.data._id)
+        prev.some((expense) => expense._id === data.data.record._id)
           ? prev.map((expense) =>
-              expense._id === data.data._id ? data.data : expense,
+              expense._id === data.data.record._id ? data.data.record : expense,
             )
-          : [data.data, ...prev],
+          : [data.data.record, ...prev],
       )
     } catch (error) {
       console.error(
