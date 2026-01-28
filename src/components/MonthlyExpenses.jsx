@@ -8,7 +8,6 @@ export default function MonthlyExpenses() {
   const [error, setError] = useState('')
   const month = '2026-01-01T00:00:00.000Z'
 
-  // Totals per parent category + grand total (derived state; no setState to avoid re-render loops)
   const totals = useMemo(() => {
     const byParent = Object.create(null)
     const grand = { projTotal: 0, actTotal: 0, difference: 0 }
@@ -30,7 +29,6 @@ export default function MonthlyExpenses() {
       grand.actTotal += act
     }
 
-    // difference for expenses: projected - actual
     for (const key of Object.keys(byParent)) {
       byParent[key].difference = byParent[key].projTotal - byParent[key].actTotal
     }
@@ -42,16 +40,11 @@ export default function MonthlyExpenses() {
   useEffect(() => {
     async function fetchParentCategories() {
       try {
-        const response = await fetch(
-          '/api/v1/parent-categories/2026-01-01T00:00:00.000Z',
-          {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        )
+        const response = await fetch('/api/v1/parent-categories/2026-01-01T00:00:00.000Z', {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        })
         const data = await response.json()
 
         if (!response.ok || data.success === false) {
@@ -60,10 +53,7 @@ export default function MonthlyExpenses() {
 
         setParentCategories(data.data)
       } catch (error) {
-        console.error(
-          'Following error occured while fetching parent-categories',
-          error,
-        )
+        console.error('Following error occured while fetching parent-categories', error)
         setError(error?.message)
       } finally {
         setIsLoading(false)
@@ -77,17 +67,13 @@ export default function MonthlyExpenses() {
           {
             method: 'GET',
             credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
           },
         )
         const data = await response.json()
 
         if (!response.ok || data.success === false) {
-          throw new Error(
-            data.message || 'Fetching monthly-categorical-expenses failed',
-          )
+          throw new Error(data.message || 'Fetching monthly-categorical-expenses failed')
         }
 
         setMonthlyCatExpenses(data.data)
@@ -111,17 +97,13 @@ export default function MonthlyExpenses() {
       const response = await fetch('/api/v1/monthly-categorical-expenses/', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
-        throw new Error(
-          data.message || 'Creating monthly-categorical-expense record failed',
-        )
+        throw new Error(data.message || 'Creating monthly-categorical-expense record failed')
       }
 
       setMonthlyCatExpenses((prev) => [...prev, data.data])
@@ -137,30 +119,21 @@ export default function MonthlyExpenses() {
 
   async function updateMonthlyCategoricalExpense(id, body) {
     try {
-      const response = await fetch(
-        `/api/v1/monthly-categorical-expenses/${id}`,
-        {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(body),
-        },
-      )
+      const response = await fetch(`/api/v1/monthly-categorical-expenses/${id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
-        throw new Error(
-          data.message || 'Updating monthly-categorical-expense record failed',
-        )
+        throw new Error(data.message || 'Updating monthly-categorical-expense record failed')
       }
 
       setMonthlyCatExpenses((prev) =>
         prev.some((expense) => expense._id === data.data._id)
-          ? prev.map((expense) =>
-              expense._id === data.data._id ? data.data : expense,
-            )
+          ? prev.map((expense) => (expense._id === data.data._id ? data.data : expense))
           : [data.data, ...prev],
       )
     } catch (error) {
@@ -180,9 +153,7 @@ export default function MonthlyExpenses() {
         {
           method: 'PATCH',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         },
       )
@@ -191,8 +162,7 @@ export default function MonthlyExpenses() {
 
       if (!response.ok || data.success === false) {
         throw new Error(
-          data.message ||
-            'Toggling monthly-categorical-expense record selectable failed',
+          data.message || 'Toggling monthly-categorical-expense record selectable failed',
         )
       }
 
@@ -215,27 +185,18 @@ export default function MonthlyExpenses() {
 
   async function deleteMonthlyCategoricalExpense(id) {
     try {
-      const response = await fetch(
-        `/api/v1/monthly-categorical-expenses/${id}`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
+      const response = await fetch(`/api/v1/monthly-categorical-expenses/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      })
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
-        throw new Error(
-          data.message || 'Deleting monthly-categorical-expense record failed',
-        )
+        throw new Error(data.message || 'Deleting monthly-categorical-expense record failed')
       }
 
-      setMonthlyCatExpenses((prev) =>
-        prev.filter((expense) => expense._id !== id),
-      )
+      setMonthlyCatExpenses((prev) => prev.filter((expense) => expense._id !== id))
     } catch (error) {
       console.error(
         'Following error occured while deleting monthly-categorical-expenses record:',
@@ -249,10 +210,12 @@ export default function MonthlyExpenses() {
   if (isLoading) return <h1>Loading...</h1>
 
   return (
-    <section>
-      <div className='text-center'>MonthlyExpenses</div>
-      {error && <p className='text-sm text-red-600'>{error}</p>}
+    <section className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-lg font-medium'>Monthly Expenses</h2>
+      </div>
 
+      {error && <p className='text-red-500 text-sm'>{error}</p>}
       {parentCategories.length === 0 && <p>No categories available.</p>}
 
       {parentCategories.length > 0 &&
@@ -261,69 +224,69 @@ export default function MonthlyExpenses() {
             (expense) => String(expense.parentId) === String(parentCategory._id),
           )
 
-          const parentTotals =
-            totals.byParent[String(parentCategory._id)] ?? {
-              projTotal: 0,
-              actTotal: 0,
-              difference: 0,
-            }
+          const parentTotals = totals.byParent[String(parentCategory._id)] ?? {
+            projTotal: 0,
+            actTotal: 0,
+            difference: 0,
+          }
 
           return (
-            <React.Fragment key={parentCategory._id}>
-              <DataHeader
-                sectionName={parentCategory.description}
-                showSelectable={true}
-              />
+            <div key={parentCategory._id} className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <h3 className='font-medium'>{parentCategory.description}</h3>
+              </div>
 
-              {relevantExpenses.length === 0 && (
-                <p>No expenses recorded for this category.</p>
-              )}
+              <div className='space-y-2 overflow-x-auto'>
+                <DataHeader sectionName={parentCategory.description} showSelectable={true} />
 
-              {relevantExpenses.length > 0 &&
-                relevantExpenses.map((expense, index) => (
-                  <DataItem
-                    key={expense._id}
-                    id={expense._id}
-                    index={index}
-                    description={expense.description}
-                    projAmount={expense.projectedAmount}
-                    actualAmount={expense.actualAmount}
-                    projMinusActual={true}
-                    isActualDisabled={expense.selectable}
-                    showSelectable={true}
-                    initialSelectable={expense.selectable}
-                    toggleSelectableFn={toggleSelectableFn}
-                    deleteRecordFn={deleteMonthlyCategoricalExpense}
-                    updateRecordFn={updateMonthlyCategoricalExpense}
-                  />
-                ))}
+                {relevantExpenses.length === 0 && (
+                  <p className='text-sm opacity-80'>No expenses recorded for this category.</p>
+                )}
 
-              <CreateDataItem
-                createRecordFn={createMonthlyCategoricalExpenses}
-                parentId={parentCategory._id}
-              />
+                {relevantExpenses.length > 0 &&
+                  relevantExpenses.map((expense, index) => (
+                    <DataItem
+                      key={expense._id}
+                      id={expense._id}
+                      index={index}
+                      description={expense.description}
+                      projAmount={expense.projectedAmount}
+                      actualAmount={expense.actualAmount}
+                      projMinusActual={true}
+                      isActualDisabled={expense.selectable}
+                      showSelectable={true}
+                      initialSelectable={expense.selectable}
+                      toggleSelectableFn={toggleSelectableFn}
+                      deleteRecordFn={deleteMonthlyCategoricalExpense}
+                      updateRecordFn={updateMonthlyCategoricalExpense}
+                    />
+                  ))}
 
-              {/* Per-parent totals */}
-              <div className='mt-2 text-sm text-gray-700'>
-                <div className='flex flex-wrap gap-x-6 gap-y-1'>
-                  <span className='font-medium'>Total</span>
-                  <span>Projected: {parentTotals.projTotal}</span>
-                  <span>Actual: {parentTotals.actTotal}</span>
-                  <span>Difference: {parentTotals.difference}</span>
+                <CreateDataItem
+                  createRecordFn={createMonthlyCategoricalExpenses}
+                  parentId={parentCategory._id}
+                />
+              </div>
+
+              <div className='overflow-x-auto'>
+                <div className='min-w-[720px] grid grid-cols-4 gap-2 px-2 py-2 border border-slate-700/50 rounded'>
+                  <div className='font-medium'>Total</div>
+                  <div className='text-right'>Projected: {parentTotals.projTotal}</div>
+                  <div className='text-right'>Actual: {parentTotals.actTotal}</div>
+                  <div className='text-right'>Difference: {parentTotals.difference}</div>
                 </div>
               </div>
-            </React.Fragment>
+            </div>
           )
         })}
 
-      {/* Grand total across all parent categories */}
       {parentCategories.length > 0 && (
-        <div className='mt-6 border-t pt-3 text-sm text-gray-800'>
-          <div className='flex flex-wrap gap-x-6 gap-y-1'>
-            <span className='font-semibold'>Grand Total</span>
-            <span>Projected: {totals.grand.projTotal}</span>
-            <span>Actual: {totals.grand.actTotal}</span>
-            <span>Difference: {totals.grand.difference}</span>
+        <div className='overflow-x-auto'>
+          <div className='min-w-[720px] grid grid-cols-4 gap-2 px-2 py-2 border border-slate-700/50 rounded'>
+            <div className='font-medium'>Grand Total</div>
+            <div className='text-right'>Projected: {totals.grand.projTotal}</div>
+            <div className='text-right'>Actual: {totals.grand.actTotal}</div>
+            <div className='text-right'>Difference: {totals.grand.difference}</div>
           </div>
         </div>
       )}

@@ -2,9 +2,9 @@ import Container from '../container/Container'
 
 export default function Footer() {
   return (
-    <footer>
+    <footer className='border-t border-slate-700/50'>
       <Container>
-        <div>
+        <div className='py-4 text-sm'>
           &copy; Copyright 2026. All Rights Reserved by Home Budgeting.
         </div>
       </Container>

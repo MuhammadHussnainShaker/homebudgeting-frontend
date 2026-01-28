@@ -21,7 +21,6 @@ export default function ExpenseItem({
     setCategoryId(initialCategoryId ?? '')
   }, [initialDescription, initialAmount, initialCategoryId])
 
-  // Convert string to number
   function toNumber(value) {
     const n = parseFloat(value)
     return Number.isFinite(n) ? n : 0
@@ -31,7 +30,6 @@ export default function ExpenseItem({
     const trimmedDesc = description.trim()
     const amountInNum = toNumber(amount)
 
-    // Delete record if description is empty
     if (trimmedDesc === '') {
       const deleteRecord = confirm(
         'Empty description will delete this record! Do you want to proceed?',
@@ -60,10 +58,8 @@ export default function ExpenseItem({
       body.monthlyCategoricalExpenseId = categoryId === '' ? null : categoryId
     }
 
-    // Return if body object is empty, nothing to update
     if (Object.keys(body).length === 0) return
 
-    // Try to update record
     setIsSubmitting(true)
     try {
       await updateRecordFn(id, body)
@@ -87,90 +83,83 @@ export default function ExpenseItem({
   }
 
   const inputBase =
-    'w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-70'
+    'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
 
   return (
-    <div className='rounded-lg border border-gray-200/60 dark:border-gray-700/60 bg-white/60 dark:bg-gray-900/40 p-3 sm:p-0 sm:border-0 sm:bg-transparent'>
-      <div className='grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-center sm:gap-2'>
-        <div className='flex items-center justify-between sm:block sm:col-span-1'>
-          <div className='text-sm font-semibold text-gray-700 dark:text-gray-200'>
-            {index + 1}
-          </div>
-          <div className='sm:hidden text-xs text-gray-500'>Item</div>
-        </div>
+    <div className='min-w-[720px] grid grid-cols-[3rem_1fr_8rem_1fr] gap-2 px-2 py-2 border border-slate-700/50 rounded'>
+      <div className='flex items-center text-sm'>{index + 1}</div>
 
-        <div className='sm:col-span-5'>
-          <label className='sm:hidden mb-1 block text-xs text-gray-500'>
-            Description
-          </label>
-          <div className='relative flex items-center'>
-            <input
-              type='text'
-              name={`description-${id}`}
-              id={`description-${id}`}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputBase}
-              disabled={isSubmitting}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-            />
-            {isSubmitting && description !== initialDescription && (
-              <div className='absolute right-2'>
-                <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
-              </div>
-            )}
+      <div className='relative'>
+        <label className='sr-only' htmlFor={`description-${id}`}>
+          Description
+        </label>
+        <input
+          type='text'
+          name={`description-${id}`}
+          id={`description-${id}`}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={isSubmitting}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className={inputBase}
+        />
+        {isSubmitting && description !== initialDescription && (
+          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className='sm:col-span-2'>
-          <label className='sm:hidden mb-1 block text-xs text-gray-500'>
-            Amount
-          </label>
-          <div className='relative flex items-center'>
-            <input
-              type='number'
-              name={`amount-${id}`}
-              id={`amount-${id}`}
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className={inputBase}
-              disabled={isSubmitting}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-            />
-            {isSubmitting && amount != initialAmount && (
-              <div className='absolute right-2'>
-                <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
-              </div>
-            )}
+      <div className='relative'>
+        <label className='sr-only' htmlFor={`amount-${id}`}>
+          Amount
+        </label>
+        <input
+          type='number'
+          name={`amount-${id}`}
+          id={`amount-${id}`}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          disabled={isSubmitting}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className={[inputBase, 'text-right'].join(' ')}
+        />
+        {isSubmitting && amount != initialAmount && (
+          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className='categoryContainer'>
-          <select
-            name={`category-${id}`}
-            id={`category-${id}`}
-            value={categoryId ?? ''}
-            onChange={(e) => setCategoryId(e.target.value)}
-            disabled={isSubmitting}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-          >
-            <option value=''>--Please choose an option--</option>
-            {selectableCategories.length > 0 ? (
-              selectableCategories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.description}
-                </option>
-              ))
-            ) : (
-              <option value='' disabled>
-                --No category is made selectable from monthly expenses--
+      <div>
+        <label className='sr-only' htmlFor={`category-${id}`}>
+          Category
+        </label>
+        <select
+          name={`category-${id}`}
+          id={`category-${id}`}
+          value={categoryId ?? ''}
+          onChange={(e) => setCategoryId(e.target.value)}
+          disabled={isSubmitting}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className={inputBase}
+        >
+          <option value=''>--Please choose an option--</option>
+          {selectableCategories.length > 0 ? (
+            selectableCategories.map((category) => (
+              <option key={category._id} value={category._id}>
+                {category.description}
               </option>
-            )}
-          </select>
-        </div>
+            ))
+          ) : (
+            <option value='' disabled>
+              --No category is made selectable from monthly expenses--
+            </option>
+          )}
+        </select>
       </div>
     </div>
   )

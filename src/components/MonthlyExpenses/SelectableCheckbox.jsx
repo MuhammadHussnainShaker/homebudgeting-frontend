@@ -33,18 +33,15 @@ export default function SelectableCheckbox({
   }
 
   return (
-    <>
-      <label className='sm:hidden mb-1 block text-xs text-gray-500'>
-        Selectable
-      </label>
-      <input
-        type='checkbox'
-        name={`selectable-${id}`}
-        id={`selectable-${id}`}
-        checked={selectable}
-        onChange={onChange}
-        disabled={isSubmitting}
-      />
-    </>
+    <input
+      type='checkbox'
+      name={`selectable-${id}`}
+      id={`selectable-${id}`}
+      checked={selectable}
+      onChange={onChange}
+      disabled={isSubmitting}
+      className='h-4 w-4'
+      aria-label='Selectable'
+    />
   )
 }

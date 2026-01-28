@@ -3,23 +3,29 @@ export default function DataHeader({
   className = '',
   showSelectable = false,
 }) {
+  const gridCols = showSelectable
+    ? 'grid-cols-[3rem_1fr_8rem_8rem_8rem_7rem]'
+    : 'grid-cols-[3rem_1fr_8rem_8rem_8rem]'
+
   return (
     <div
       className={[
-        'hidden sm:grid sm:grid-cols-12 sm:gap-2',
-        'text-xs font-semibold text-gray-700 dark:text-gray-200',
-        'pb-2 border-b border-gray-200/60 dark:border-gray-700/60',
+        'min-w-[720px]',
+        'grid',
+        gridCols,
+        'gap-2',
+        'px-2 py-2',
+        'text-sm font-medium',
+        'border border-slate-700/50 rounded',
         className,
       ].join(' ')}
     >
-      <div className='sm:col-span-1'>#</div>
-      <div className='sm:col-span-3'>{sectionName}</div>
-      <div className='sm:col-span-2'>Projected</div>
-      <div className='sm:col-span-2'>Actual</div>
-      <div className='sm:col-span-2'>Difference</div>
-      {showSelectable && (
-        <div className='sm:col-span-2'>Selectable</div>
-      )}
+      <div>#</div>
+      <div className='truncate'>{sectionName}</div>
+      <div className='text-right'>Projected</div>
+      <div className='text-right'>Actual</div>
+      <div className='text-right'>Difference</div>
+      {showSelectable && <div className='text-center'>Selectable</div>}
     </div>
   )
 }

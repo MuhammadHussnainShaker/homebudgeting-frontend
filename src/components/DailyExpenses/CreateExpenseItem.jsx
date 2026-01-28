@@ -10,7 +10,6 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
     if (trimmedDesc !== '') body.description = trimmedDesc
     if (Object.keys(body).length == 0) return
 
-    // Try to create record
     setIsSubmitting(true)
     body.date = new Date(date).toISOString()
     try {
@@ -29,46 +28,40 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
   }
 
   const inputBase =
-    'w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500/40 disabled:opacity-70'
+    'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
 
   return (
-    <div className='rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-white/40 dark:bg-gray-900/20 p-3'>
-      <div className='grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-center sm:gap-2'>
-        <div className='sm:col-span-1 text-sm font-semibold text-gray-700 dark:text-gray-200'>
-          +
-        </div>
+    <div className='min-w-[720px] grid grid-cols-[3rem_1fr_8rem_1fr] gap-2 px-2 py-2 border border-dashed border-slate-700/50 rounded'>
+      <div className='flex items-center font-medium'>+</div>
 
-        <div className='sm:col-span-5'>
-          <label className='sm:hidden mb-1 block text-xs text-gray-500'>
-            New item description
-          </label>
-          <div className='relative flex items-center'>
-            <input
-              type='text'
-              name='createDescription'
-              id='createDescription'
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className={inputBase}
-              disabled={isSubmitting}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-            />
-            {isSubmitting && (
-              <div className='absolute right-2'>
-                <div className='h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600' />
-              </div>
-            )}
+      <div className='relative'>
+        <label className='sr-only' htmlFor='createDescription'>
+          New item description
+        </label>
+        <input
+          type='text'
+          name='createDescription'
+          id='createDescription'
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={isSubmitting}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className={inputBase}
+          placeholder='New expense...'
+        />
+        {isSubmitting && (
+          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
           </div>
-        </div>
-
-        <div className='sm:col-span-2'>
-          <label className='sm:hidden mb-1 block text-xs text-gray-500'>
-            Amount
-          </label>
-          <input type='number' className={inputBase} disabled />
-        </div>
+        )}
       </div>
+
+      <div>
+        <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
+      </div>
+
+      <div />
     </div>
   )
 }

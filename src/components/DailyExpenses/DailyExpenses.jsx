@@ -5,7 +5,6 @@ import CreateExpenseItem from './CreateExpenseItem'
 export default function DailyExpenses() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [dailyExpenses, setDailyExpenses] = useState([])
-  // derived total (no extra state)
   const totals = useMemo(() => {
     const totalAmount = dailyExpenses.reduce(
       (sum, exp) => sum + (Number(exp.amount) || 0),
@@ -21,17 +20,11 @@ export default function DailyExpenses() {
     async function fetchDailyExpenses() {
       setIsLoading(true)
       try {
-        const response = await fetch(
-          // localhost:8081/api/v1/daily-expense?date=2026-07-01&month=2026-01
-          `/api/v1/daily-expense?date=${date}`,
-          {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        )
+        const response = await fetch(`/api/v1/daily-expense?date=${date}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        })
         const data = await response.json()
 
         if (!response.ok || data.success === false) {
@@ -41,10 +34,7 @@ export default function DailyExpenses() {
         setDailyExpenses(data.data.dailyExpenses)
         setSelectableCategories(data.data.selectableCategoricalExpenses)
       } catch (error) {
-        console.error(
-          'Following error occured while fetching daily-expenses',
-          error,
-        )
+        console.error('Following error occured while fetching daily-expenses', error)
         setError(error?.message)
       } finally {
         setIsLoading(false)
@@ -59,25 +49,22 @@ export default function DailyExpenses() {
       const response = await fetch('/api/v1/daily-expense', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
 
       if (!response.ok) {
-        const text = await response.text() // safe even if empty or not JSON
+        const text = await response.text()
         let message = response.statusText || 'Request failed'
         try {
           const errJson = text ? JSON.parse(text) : null
           message = errJson?.message ?? errJson?.error ?? message
         } catch (e) {
-          // not JSON, use plain text
           message = text || message
         }
         throw new Error(message)
       }
-      
+
       const data = await response.json()
 
       if (!response.ok || data.success === false) {
@@ -86,10 +73,7 @@ export default function DailyExpenses() {
 
       setDailyExpenses((prev) => [...prev, data.data])
     } catch (error) {
-      console.error(
-        'Following error occured while creating daily-expense record',
-        error,
-      )
+      console.error('Following error occured while creating daily-expense record', error)
       setError(error?.message)
       throw error
     }
@@ -100,9 +84,7 @@ export default function DailyExpenses() {
       const response = await fetch(`/api/v1/daily-expense/${id}`, {
         method: 'PATCH',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
       const data = await response.json()
@@ -113,16 +95,11 @@ export default function DailyExpenses() {
 
       setDailyExpenses((prev) =>
         prev.some((expense) => expense._id === data.data._id)
-          ? prev.map((expense) =>
-              expense._id === data.data._id ? data.data : expense,
-            )
+          ? prev.map((expense) => (expense._id === data.data._id ? data.data : expense))
           : [data.data, ...prev],
       )
     } catch (error) {
-      console.error(
-        'Following error occured while updating daily-expense record:',
-        error,
-      )
+      console.error('Following error occured while updating daily-expense record:', error)
       setError(error?.message)
       throw error
     }
@@ -133,9 +110,7 @@ export default function DailyExpenses() {
       const response = await fetch(`/api/v1/daily-expense/${id}`, {
         method: 'DELETE',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       })
       const data = await response.json()
 
@@ -145,10 +120,7 @@ export default function DailyExpenses() {
 
       setDailyExpenses((prev) => prev.filter((expense) => expense._id != id))
     } catch (error) {
-      console.error(
-        'Following error occured while deleting daily-expense record:',
-        error,
-      )
+      console.error('Following error occured while deleting daily-expense record:', error)
       setError(error?.message)
       throw error
     }
@@ -157,28 +129,36 @@ export default function DailyExpenses() {
   if (isLoading) return <h1>Loading...</h1>
 
   return (
-    <section>
-      <h1 className='text-center'>DailyExpenses Component</h1>
-      {error && <p className='text-sm text-red-600'>{error}</p>}
-      <div>
-        <input
-          type='date'
-          name='daily-expense-date'
-          id='daily-expense-date'
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <div
-          className={
-            'hidden sm:grid sm:grid-cols-12 sm:gap-2 text-xs font-semibold text-gray-700 dark:text-gray-200 pb-2 border-b border-gray-200/60 dark:border-gray-700/60'
-          }
-        >
-          <div>#</div>
-          <div>Item Name</div>
-          <div>Price</div>
-          <label htmlFor='category'>Choose a category:</label>
+    <section className='space-y-3'>
+      <div className='flex flex-wrap items-center justify-between gap-3'>
+        <h2 className='text-lg font-medium'>Daily Expenses</h2>
+
+        <div className='flex items-center gap-2'>
+          <label className='text-sm' htmlFor='daily-expense-date'>
+            Date
+          </label>
+          <input
+            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
+            type='date'
+            name='daily-expense-date'
+            id='daily-expense-date'
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
         </div>
-        <div>
+      </div>
+
+      {error && <p className='text-red-500 text-sm'>{error}</p>}
+
+      <div className='space-y-2 overflow-x-auto'>
+        <div className='min-w-[720px] grid grid-cols-[3rem_1fr_8rem_1fr] gap-2 px-2 py-2 text-sm font-medium border border-slate-700/50 rounded'>
+          <div>#</div>
+          <div>Description</div>
+          <div className='text-right'>Amount</div>
+          <div>Category</div>
+        </div>
+
+        <div className='space-y-2'>
           {dailyExpenses.length > 0 &&
             dailyExpenses.map((expense, index) => (
               <ExpenseItem
@@ -194,11 +174,14 @@ export default function DailyExpenses() {
               />
             ))}
         </div>
-        <CreateExpenseItem createRecordFn={createDailyExpense} date={date} />
 
-        {/* Totals */}
-        <div className='mt-4 text-sm font-semibold text-gray-800'>
-          <span>Total: {totals.totalAmount}</span>
+        <CreateExpenseItem createRecordFn={createDailyExpense} date={date} />
+      </div>
+
+      <div className='overflow-x-auto'>
+        <div className='min-w-[720px] grid grid-cols-2 gap-2 px-2 py-2 border border-slate-700/50 rounded'>
+          <div className='font-medium'>Total</div>
+          <div className='text-right'>{totals.totalAmount}</div>
         </div>
       </div>
     </section>
