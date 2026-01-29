@@ -1,4 +1,3 @@
-# filepath: .github/workflows/frontend-ci.yml
 name: Frontend CI
 
 on: [push, pull_request]
