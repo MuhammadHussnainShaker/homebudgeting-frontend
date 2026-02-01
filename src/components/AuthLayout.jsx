@@ -10,7 +10,7 @@ export default function Protected({ authenticationRequired = true }) {
   useEffect(() => {
     if (authenticationRequired && !isAuthenticated) {
       // navigate to login if not authenticated
-      console.log('navigating to login')
+      // console.log('navigating to login')
       navigate('/login')
     } else if (!authenticationRequired && isAuthenticated) {
       // navigate to dashboard if authenticated
