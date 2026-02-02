@@ -133,7 +133,7 @@ export default function ExpenseItem({
         )}
       </div>
 
-      <div>
+      <div className='relative'>
         <label className='sr-only' htmlFor={`category-${id}`}>
           Category
         </label>
@@ -160,6 +160,11 @@ export default function ExpenseItem({
             </option>
           )}
         </select>
+        {isSubmitting && categoryId != initialCategoryId && (
+          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
+          </div>
+        )}
       </div>
     </div>
   )
