@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import SelectableCheckbox from './MonthlyExpenses/SelectableCheckbox'
-import LoadingSpinner from './LoadingSpinner'
-import { calculateDifference, toNumber } from '../utils/calculations'
-import { createKeyDownHandler } from '../utils/keyboard'
+import SelectableCheckbox from '../views/MonthlyExpenses/SelectableCheckbox'
+import LoadingSpinner from '../ui/LoadingSpinner'
+import { calculateDifference, toNumber } from '../../utils/calculations'
+import { createKeyDownHandler } from '../../utils/keyboard'
 
 export default function DataItem({
   id,

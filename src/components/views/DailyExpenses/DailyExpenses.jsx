@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import ExpenseItem from './ExpenseItem'
 import CreateExpenseItem from './CreateExpenseItem'
-import ErrorMessage from '../ErrorMessage'
-import { apiFetch, apiFetchWithTextFallback } from '../../utils/apiFetch'
-import { sumBy } from '../../utils/calculations'
+import ErrorMessage from '@/components/ui/ErrorMessage'
+import { apiFetch, apiFetchWithTextFallback } from '@/utils/apiFetch'
+import { sumBy } from '@/utils/calculations'
 import {
   addItemToList,
   removeItemFromList,
   updateItemInList,
-} from '../../utils/listStateUpdaters'
+} from '@/utils/listStateUpdaters'
 
 export default function DailyExpenses() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])

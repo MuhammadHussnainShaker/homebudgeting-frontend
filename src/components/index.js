@@ -1,15 +1,28 @@
-import AuthLayout from './AuthLayout'
-import Signup from './Signup'
-import Login from './Login'
-import Container from './container/Container'
-import Header from './Header/Header'
-import Footer from "./Footer/Footer";
-import DataHeader from './DataHeader'
-import DataItem from './DataItem'
-import CreateDataItem from './CreateDataItem'
-import Incomes from './Incomes'
-import Savings from './Savings'
-import MonthlyExpenses from './MonthlyExpenses/MonthlyExpenses'
-import DailyExpenses from './DailyExpenses/DailyExpenses'
-
-export { AuthLayout, Signup, Container, Header, Footer, Login, Incomes, Savings, DataHeader, DataItem, CreateDataItem, MonthlyExpenses, DailyExpenses }
+import AuthLayout from './auth/AuthLayout'
+import Signup from './auth/Signup/Signup'
+import Login from './auth/Login/Login'
+import Container from './layout/container/Container'
+import Header from './layout/Header/Header'
+import Footer from './layout/Footer/Footer'
+import Incomes from './views/Incomes/Incomes'
+import Savings from './views/Savings/Savings'
+import MonthlyExpenses from './views/MonthlyExpenses/MonthlyExpenses'
+import DailyExpenses from './views/DailyExpenses/DailyExpenses'
+import { DataItem } from './data-items'
+import { DataHeader } from './data-items'
+import { CreateDataItem } from './data-items'
+export {
+  AuthLayout,
+  Signup,
+  Container,
+  Header,
+  Footer,
+  Login,
+  Incomes,
+  Savings,
+  MonthlyExpenses,
+  DailyExpenses,
+  DataItem,
+  DataHeader,
+  CreateDataItem,
+}

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import LoadingSpinner from './LoadingSpinner'
-import { createKeyDownHandler } from '../utils/keyboard'
+import LoadingSpinner from '../../ui/LoadingSpinner'
+import { createKeyDownHandler } from '../../../utils/keyboard'
 
-export default function CreateDataItem({ createRecordFn, parentId = '' }) {
+export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState('')
 
@@ -13,13 +13,12 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
     if (Object.keys(body).length === 0) return
 
     setIsSubmitting(true)
-    body.month = new Date().toISOString()
-    if (parentId) body.parentId = parentId
+    body.date = new Date(date).toISOString()
     try {
       await createRecordFn(body)
       setDescription('')
     } catch (error) {
-      console.error('Failed to create data item record.', error)
+      console.error('Failed to create expense record.', error)
       alert('Failed to create record. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -32,16 +31,8 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
     'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
 
   return (
-    <div
-      className={[
-        'min-w-[720px]',
-        'grid grid-cols-[3rem_1fr_8rem_8rem_8rem]',
-        'gap-2',
-        'px-2 py-2',
-        'border border-dashed border-slate-700/50 rounded',
-      ].join(' ')}
-    >
-      <div className='flex items-center justify-start font-medium'>+</div>
+    <div className='min-w-[720px] grid grid-cols-[3rem_1fr_8rem_1fr] gap-2 px-2 py-2 border border-dashed border-slate-700/50 rounded'>
+      <div className='flex items-center font-medium'>+</div>
 
       <div className='relative'>
         <label className='sr-only' htmlFor='createDescription'>
@@ -57,7 +48,7 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           className={inputBase}
-          placeholder='New item...'
+          placeholder='New expense...'
         />
         {isSubmitting && <LoadingSpinner />}
       </div>
@@ -65,12 +56,8 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
       <div>
         <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
       </div>
-      <div>
-        <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
-      </div>
-      <div>
-        <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
-      </div>
+
+      <div />
     </div>
   )
 }

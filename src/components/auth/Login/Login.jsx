@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import useUserStore from '../store/useUserStore'
-import ErrorMessage from './ErrorMessage'
-import { apiFetch } from '../utils/apiFetch'
+import useUserStore from '../../../store/useUserStore'
+import ErrorMessage from '../../ui/ErrorMessage'
+import { apiFetch } from '../../../utils/apiFetch'
 
-export default function Signup() {
-  const [displayName, setDisplayName] = useState('')
+export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -16,13 +15,13 @@ export default function Signup() {
     setError('')
 
     try {
-      const data = await apiFetch('/api/v1/users/register', {
+      const data = await apiFetch('/api/v1/users/login', {
         method: 'POST',
-        body: JSON.stringify({ displayName, phoneNumber }),
+        body: JSON.stringify({ phoneNumber }),
       })
       login(data.data.user)
     } catch (error) {
-      console.error('Error occurred while submitting signup form', error)
+      console.error('Error occurred while submitting login form', error)
       setError(error?.message)
     } finally {
       setIsSubmitting(false)
@@ -34,22 +33,6 @@ export default function Signup() {
       <ErrorMessage message={error} />
 
       <form onSubmit={handleSubmit} className='space-y-3'>
-        <div className='grid gap-1'>
-          <label htmlFor='displayName' className='text-sm'>
-            Name
-          </label>
-          <input
-            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-            type='text'
-            name='displayName'
-            id='displayName'
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
-        </div>
-
         <div className='grid gap-1'>
           <label htmlFor='phoneNumber' className='text-sm'>
             Phone Number
@@ -71,7 +54,7 @@ export default function Signup() {
           type='submit'
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Signing up...' : 'Signup'}
+          {isSubmitting ? 'Logging up...' : 'Login'}
         </button>
       </form>
     </div>

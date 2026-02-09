@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import useUserStore from '../store/useUserStore'
-import Login from './Login'
+import useUserStore from '../../../store/useUserStore'
+import Signup from './Signup'
 
-describe('Login', () => {
+describe('Signup', () => {
   beforeEach(() => {
     localStorage.clear()
     useUserStore.setState({ user: { isAuthenticated: false, userData: null } })
@@ -13,32 +13,38 @@ describe('Login', () => {
     vi.unstubAllGlobals()
   })
 
-  it('submits login data and stores user on success', async () => {
-    const user = { _id: 'u1', displayName: 'Ali', isActive: true }
+  it('submits signup data and stores user on success', async () => {
+    const user = { _id: 'u2', displayName: 'Zara', isActive: true }
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: vi.fn().mockResolvedValue({ success: true, data: { user } }),
     })
     vi.stubGlobal('fetch', fetchMock)
 
-    render(<Login />)
+    render(<Signup />)
 
+    fireEvent.change(screen.getByLabelText(/name/i), {
+      target: { value: 'Zara' },
+    })
     fireEvent.change(screen.getByLabelText(/phone number/i), {
       target: { value: '03001234567' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /login/i }))
+    fireEvent.click(screen.getByRole('button', { name: /signup/i }))
 
     await waitFor(() =>
       expect(useUserStore.getState().user.userData).toEqual(user),
     )
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/v1/users/login',
+      '/api/v1/users/register',
       expect.objectContaining({
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: '03001234567' }),
+        body: JSON.stringify({
+          displayName: 'Zara',
+          phoneNumber: '03001234567',
+        }),
       }),
     )
   })
@@ -48,18 +54,21 @@ describe('Login', () => {
       ok: false,
       json: vi.fn().mockResolvedValue({
         success: false,
-        message: 'Invalid credentials',
+        message: 'Signup failed',
       }),
     })
     vi.stubGlobal('fetch', fetchMock)
 
-    render(<Login />)
+    render(<Signup />)
 
+    fireEvent.change(screen.getByLabelText(/name/i), {
+      target: { value: 'Zara' },
+    })
     fireEvent.change(screen.getByLabelText(/phone number/i), {
       target: { value: '03001234567' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /login/i }))
+    fireEvent.click(screen.getByRole('button', { name: /signup/i }))
 
-    expect(await screen.findByText('Invalid credentials')).toBeInTheDocument()
+    expect(await screen.findByText('Signup failed')).toBeInTheDocument()
   })
 })
