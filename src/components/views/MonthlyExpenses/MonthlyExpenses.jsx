@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CreateDataItem, DataHeader, DataItem } from '@/components/data-items'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import useError from '@/hooks/useError'
 import { DEFAULT_MONTH } from '@/constants/dates'
 import { apiFetch } from '@/utils/apiFetch'
 import { calculateParentTotals } from '@/utils/calculations'
@@ -14,7 +15,7 @@ export default function MonthlyExpenses() {
   const [parentCategories, setParentCategories] = useState([])
   const [monthlyCatExpenses, setMonthlyCatExpenses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState('')
+  const { error, setError } = useError()
   const totals = calculateParentTotals(monthlyCatExpenses)
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function MonthlyExpenses() {
     }
 
     fetchData()
-  }, [])
+  }, [setError])
 
   async function createMonthlyCategoricalExpenses(body) {
     try {

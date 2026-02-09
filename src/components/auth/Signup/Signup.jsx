@@ -1,19 +1,20 @@
 import { useState } from 'react'
 import useUserStore from '@/store/useUserStore'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import useError from '@/hooks/useError'
 import { apiFetch } from '@/utils/apiFetch'
 
 export default function Signup() {
   const [displayName, setDisplayName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState('')
+  const { error, setError, clearError } = useError()
   const login = useUserStore((state) => state.login)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setIsSubmitting(true)
-    setError('')
+    clearError()
 
     try {
       const data = await apiFetch('/api/v1/users/register', {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ExpenseItem from '@/components/views/DailyExpenses/ExpenseItem'
 import CreateExpenseItem from '@/components/views/DailyExpenses/CreateExpenseItem'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import useError from '@/hooks/useError'
 import { apiFetch, apiFetchWithTextFallback } from '@/utils/apiFetch'
 import { sumBy } from '@/utils/calculations'
 import {
@@ -16,7 +17,7 @@ export default function DailyExpenses() {
   const totals = { totalAmount: sumBy(dailyExpenses, 'amount') }
   const [selectableCategories, setSelectableCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState('')
+  const { error, setError } = useError()
 
   useEffect(() => {
     async function fetchDailyExpenses() {
@@ -36,7 +37,7 @@ export default function DailyExpenses() {
     }
 
     fetchDailyExpenses()
-  }, [date])
+  }, [date, setError])
 
   async function createDailyExpense(body) {
     try {
