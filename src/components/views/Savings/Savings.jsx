@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DataHeader, DataItem, CreateDataItem } from '@/components'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { DEFAULT_MONTH } from '@/constants/dates'
 import { apiFetch } from '@/utils/apiFetch'
 import { calculateProjectedActualTotals } from '@/utils/calculations'
 import {
@@ -9,17 +8,19 @@ import {
   removeItemFromList,
   updateItemInList,
 } from '@/utils/listStateUpdaters'
+import useMonthStore from '@/store/useMonthStore'
 
 export default function Savings() {
   const [savings, setSavings] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const totals = calculateProjectedActualTotals(savings)
+  const month = useMonthStore((state) => state.month)
 
   useEffect(() => {
     async function fetchSavings() {
       try {
-        const data = await apiFetch(`/api/v1/savings/${DEFAULT_MONTH}`, {
+        const data = await apiFetch(`/api/v1/savings/${month}`, {
           method: 'GET',
         })
         setSavings(data.data)
@@ -32,7 +33,7 @@ export default function Savings() {
     }
 
     fetchSavings()
-  }, [])
+  }, [month])
 
   async function createSaving(body) {
     try {

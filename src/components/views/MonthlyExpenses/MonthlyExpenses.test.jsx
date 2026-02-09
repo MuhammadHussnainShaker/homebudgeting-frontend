@@ -1,8 +1,16 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import MonthlyExpenses from '@/components/views/MonthlyExpenses/MonthlyExpenses'
+import useMonthStore from '@/store/useMonthStore'
 
 describe('MonthlyExpenses', () => {
+  const testMonth = '2026-04-01T00:00:00.000Z'
+
+  beforeEach(() => {
+    localStorage.clear()
+    useMonthStore.setState({ month: testMonth })
+  })
+
   afterEach(() => {
     vi.unstubAllGlobals()
   })
@@ -38,6 +46,14 @@ describe('MonthlyExpenses', () => {
     render(<MonthlyExpenses />)
 
     expect(await screen.findByText('Monthly Expenses')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/v1/parent-categories/${testMonth}`,
+      expect.any(Object),
+    )
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/v1/monthly-categorical-expenses/${testMonth}`,
+      expect.any(Object),
+    )
     expect(screen.getByRole('heading', { name: 'Housing' })).toBeInTheDocument()
     expect(screen.getByDisplayValue('Rent')).toBeInTheDocument()
     expect(screen.getByText('Selectable')).toBeInTheDocument()
