@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import LoadingSpinner from '../LoadingSpinner'
-import { toNumber } from '../../utils/calculations'
-import { createKeyDownHandler } from '../../utils/keyboard'
+import LoadingSpinner from '../../ui/LoadingSpinner'
+import { toNumber } from '../../../utils/calculations'
+import { createKeyDownHandler } from '../../../utils/keyboard'
 
 export default function ExpenseItem({
   id,

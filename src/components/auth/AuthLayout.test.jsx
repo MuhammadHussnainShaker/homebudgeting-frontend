@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import useUserStore from '../store/useUserStore'
+import useUserStore from '../../store/useUserStore'
 import AuthLayout from './AuthLayout'
 
 describe('AuthLayout', () => {

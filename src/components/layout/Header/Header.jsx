@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router'
 import Container from '../container/Container'
-import useUserStore from '../../store/useUserStore'
+import useUserStore from '../../../store/useUserStore'
 import LogoutBtn from './LogoutBtn'
 
 export default function Header() {
