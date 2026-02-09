@@ -44,7 +44,7 @@ export default function DataItem({
         try {
           await deleteRecordFn(id)
         } catch (error) {
-          console.error('Failed to delete record.', error)
+          console.error('Failed to delete data item record.', error)
           setDescription(initialDescription)
           setProjectedAmount(String(initialProjAmount))
           setActualAmount(String(initialActualAmount))
@@ -68,7 +68,7 @@ export default function DataItem({
     try {
       await updateRecordFn(id, body)
     } catch (error) {
-      console.error('Failed to update record.', error)
+      console.error('Failed to update data item record.', error)
       setDescription(initialDescription)
       setProjectedAmount(String(initialProjAmount))
       setActualAmount(String(initialActualAmount))

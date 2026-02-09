@@ -16,7 +16,7 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
       await createRecordFn(body)
       setDescription('')
     } catch (error) {
-      console.error('Failed to create record.', error)
+      console.error('Failed to create expense record.', error)
       alert('Failed to create record. Please try again.')
     } finally {
       setIsSubmitting(false)

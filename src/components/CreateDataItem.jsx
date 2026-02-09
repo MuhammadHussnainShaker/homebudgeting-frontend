@@ -17,7 +17,7 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
       await createRecordFn(body)
       setDescription('')
     } catch (error) {
-      console.error('Failed to create record.', error)
+      console.error('Failed to create data item record.', error)
       alert('Failed to create record. Please try again.')
     } finally {
       setIsSubmitting(false)
