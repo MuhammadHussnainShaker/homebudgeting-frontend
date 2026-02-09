@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import LoadingSpinner from '../LoadingSpinner'
+import { createKeyDownHandler } from '../../utils/keyboard'
 
 export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -8,7 +10,7 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
     const trimmedDesc = description.trim()
     const body = {}
     if (trimmedDesc !== '') body.description = trimmedDesc
-    if (Object.keys(body).length == 0) return
+    if (Object.keys(body).length === 0) return
 
     setIsSubmitting(true)
     body.date = new Date(date).toISOString()
@@ -16,16 +18,14 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
       await createRecordFn(body)
       setDescription('')
     } catch (error) {
+      console.error('Failed to create expense record.', error)
       alert('Failed to create record. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') e.target.blur()
-    else if (e.key === 'Escape') setDescription('')
-  }
+  const handleKeyDown = createKeyDownHandler(() => setDescription(''))
 
   const inputBase =
     'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
@@ -50,11 +50,7 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
           className={inputBase}
           placeholder='New expense...'
         />
-        {isSubmitting && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && <LoadingSpinner />}
       </div>
 
       <div>

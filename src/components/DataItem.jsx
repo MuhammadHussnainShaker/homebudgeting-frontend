@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import SelectableCheckbox from './MonthlyExpenses/SelectableCheckbox'
+import LoadingSpinner from './LoadingSpinner'
+import { calculateDifference, toNumber } from '../utils/calculations'
+import { createKeyDownHandler } from '../utils/keyboard'
 
 export default function DataItem({
   id,
@@ -26,11 +29,6 @@ export default function DataItem({
     setActualAmount(String(initialActualAmount))
   }, [initialDescription, initialProjAmount, initialActualAmount])
 
-  function toNumber(value) {
-    const n = parseFloat(value)
-    return Number.isFinite(n) ? n : 0
-  }
-
   async function handleBlur() {
     const trimmedDesc = description.trim()
     const projectedValue = toNumber(projAmount)
@@ -44,6 +42,7 @@ export default function DataItem({
         try {
           await deleteRecordFn(id)
         } catch (error) {
+          console.error('Failed to delete data item record.', error)
           setDescription(initialDescription)
           setProjectedAmount(String(initialProjAmount))
           setActualAmount(String(initialActualAmount))
@@ -61,12 +60,13 @@ export default function DataItem({
       body.projectedAmount = projectedValue
     if (actualValue !== initialActualAmount) body.actualAmount = actualValue
 
-    if (Object.keys(body).length == 0) return
+    if (Object.keys(body).length === 0) return
 
     setIsSubmitting(true)
     try {
       await updateRecordFn(id, body)
     } catch (error) {
+      console.error('Failed to update data item record.', error)
       setDescription(initialDescription)
       setProjectedAmount(String(initialProjAmount))
       setActualAmount(String(initialActualAmount))
@@ -76,18 +76,15 @@ export default function DataItem({
     }
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') e.target.blur()
-    else if (e.key === 'Escape') {
-      setDescription(initialDescription)
-      setProjectedAmount(String(initialProjAmount))
-      setActualAmount(String(initialActualAmount))
-    }
+  const resetValues = () => {
+    setDescription(initialDescription)
+    setProjectedAmount(String(initialProjAmount))
+    setActualAmount(String(initialActualAmount))
   }
 
-  const diffValue = projMinusActual
-    ? toNumber(projAmount) - toNumber(actualAmount)
-    : toNumber(actualAmount) - toNumber(projAmount)
+  const handleKeyDown = createKeyDownHandler(resetValues)
+
+  const diffValue = calculateDifference(projAmount, actualAmount, projMinusActual)
 
   const gridCols = showSelectable
     ? 'grid-cols-[3rem_1fr_8rem_8rem_8rem_7rem]'
@@ -124,11 +121,7 @@ export default function DataItem({
           onKeyDown={handleKeyDown}
           className={inputBase}
         />
-        {isSubmitting && description !== initialDescription && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && description !== initialDescription && <LoadingSpinner />}
       </div>
 
       <div className='relative'>
@@ -146,11 +139,7 @@ export default function DataItem({
           onKeyDown={handleKeyDown}
           className={[inputBase, 'text-right'].join(' ')}
         />
-        {isSubmitting && projAmount != initialProjAmount && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && projAmount != initialProjAmount && <LoadingSpinner />}
       </div>
 
       <div className='relative'>
@@ -168,11 +157,7 @@ export default function DataItem({
           onKeyDown={handleKeyDown}
           className={[inputBase, 'text-right'].join(' ')}
         />
-        {isSubmitting && actualAmount != initialActualAmount && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && actualAmount != initialActualAmount && <LoadingSpinner />}
       </div>
 
       <div>

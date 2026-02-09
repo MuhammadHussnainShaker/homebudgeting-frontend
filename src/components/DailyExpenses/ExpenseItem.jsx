@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import LoadingSpinner from '../LoadingSpinner'
+import { toNumber } from '../../utils/calculations'
+import { createKeyDownHandler } from '../../utils/keyboard'
 
 export default function ExpenseItem({
   id,
@@ -21,11 +24,6 @@ export default function ExpenseItem({
     setCategoryId(initialCategoryId ?? '')
   }, [initialDescription, initialAmount, initialCategoryId])
 
-  function toNumber(value) {
-    const n = parseFloat(value)
-    return Number.isFinite(n) ? n : 0
-  }
-
   async function handleBlur() {
     const trimmedDesc = description.trim()
     const amountInNum = toNumber(amount)
@@ -38,6 +36,7 @@ export default function ExpenseItem({
         try {
           await deleteRecordFn(id)
         } catch (error) {
+          console.error('Failed to delete expense record.', error)
           setDescription(initialDescription)
           setAmount(String(initialAmount))
           setCategoryId(initialCategoryId ?? '')
@@ -64,6 +63,7 @@ export default function ExpenseItem({
     try {
       await updateRecordFn(id, body)
     } catch (error) {
+      console.error('Failed to update expense record.', error)
       setDescription(initialDescription)
       setAmount(String(initialAmount))
       setCategoryId(initialCategoryId ?? '')
@@ -73,14 +73,13 @@ export default function ExpenseItem({
     }
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') e.target.blur()
-    else if (e.key === 'Escape') {
-      setDescription(initialDescription)
-      setAmount(String(initialAmount))
-      setCategoryId(initialCategoryId ?? '')
-    }
+  const resetValues = () => {
+    setDescription(initialDescription)
+    setAmount(String(initialAmount))
+    setCategoryId(initialCategoryId ?? '')
   }
+
+  const handleKeyDown = createKeyDownHandler(resetValues)
 
   const inputBase =
     'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
@@ -104,11 +103,7 @@ export default function ExpenseItem({
           onKeyDown={handleKeyDown}
           className={inputBase}
         />
-        {isSubmitting && description !== initialDescription && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && description !== initialDescription && <LoadingSpinner />}
       </div>
 
       <div className='relative'>
@@ -126,11 +121,7 @@ export default function ExpenseItem({
           onKeyDown={handleKeyDown}
           className={[inputBase, 'text-right'].join(' ')}
         />
-        {isSubmitting && amount != initialAmount && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && amount != initialAmount && <LoadingSpinner />}
       </div>
 
       <div className='relative'>
@@ -160,11 +151,7 @@ export default function ExpenseItem({
             </option>
           )}
         </select>
-        {isSubmitting && categoryId != initialCategoryId && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && categoryId != initialCategoryId && <LoadingSpinner />}
       </div>
     </div>
   )
