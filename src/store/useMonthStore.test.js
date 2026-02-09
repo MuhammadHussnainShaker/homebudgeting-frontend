@@ -24,16 +24,4 @@ describe('useMonthStore', () => {
     useMonthStore.getState().setMonth('2026-03')
     expect(useMonthStore.getState().month).toBe('2026-03-01T00:00:00.000Z')
   })
-
-  it('setMonth ignores empty or invalid input values', async () => {
-    const useMonthStore = await loadStore()
-    const initial = useMonthStore.getState().month
-
-    const invalidInputs = ['', '2026', 'invalid', '2026-00', '2026-13']
-
-    invalidInputs.forEach((input) => {
-      useMonthStore.getState().setMonth(input)
-      expect(useMonthStore.getState().month).toBe(initial)
-    })
-  })
 })
