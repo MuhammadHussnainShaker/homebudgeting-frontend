@@ -29,10 +29,11 @@ describe('useMonthStore', () => {
     const useMonthStore = await loadStore()
     const initial = useMonthStore.getState().month
 
-    useMonthStore.getState().setMonth('')
-    expect(useMonthStore.getState().month).toBe(initial)
+    const invalidInputs = ['', '2026', 'invalid', '2026-00', '2026-13']
 
-    useMonthStore.getState().setMonth('2026-13')
-    expect(useMonthStore.getState().month).toBe(initial)
+    invalidInputs.forEach((input) => {
+      useMonthStore.getState().setMonth(input)
+      expect(useMonthStore.getState().month).toBe(initial)
+    })
   })
 })

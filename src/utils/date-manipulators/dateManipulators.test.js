@@ -11,6 +11,9 @@ describe('date manipulators', () => {
   it('converts YYYY-MM values to ISO start-of-month dates', () => {
     expect(yyyyMMToISODate('2026-03')).toBe('2026-03-01T00:00:00.000Z')
     expect(yyyyMMToISODate('')).toBe('')
+    expect(yyyyMMToISODate('2026')).toBe('')
+    expect(yyyyMMToISODate('invalid')).toBe('')
+    expect(yyyyMMToISODate('2026-00')).toBe('')
     expect(yyyyMMToISODate('2026-13')).toBe('')
   })
 })
