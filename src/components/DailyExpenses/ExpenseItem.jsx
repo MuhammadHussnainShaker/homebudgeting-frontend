@@ -38,6 +38,7 @@ export default function ExpenseItem({
         try {
           await deleteRecordFn(id)
         } catch (error) {
+          console.error('Failed to delete record.', error)
           setDescription(initialDescription)
           setAmount(String(initialAmount))
           setCategoryId(initialCategoryId ?? '')
@@ -64,6 +65,7 @@ export default function ExpenseItem({
     try {
       await updateRecordFn(id, body)
     } catch (error) {
+      console.error('Failed to update record.', error)
       setDescription(initialDescription)
       setAmount(String(initialAmount))
       setCategoryId(initialCategoryId ?? '')

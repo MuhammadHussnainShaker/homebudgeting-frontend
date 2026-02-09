@@ -59,7 +59,7 @@ export default function DailyExpenses() {
         try {
           const errJson = text ? JSON.parse(text) : null
           message = errJson?.message ?? errJson?.error ?? message
-        } catch (e) {
+        } catch {
           message = text || message
         }
         throw new Error(message)

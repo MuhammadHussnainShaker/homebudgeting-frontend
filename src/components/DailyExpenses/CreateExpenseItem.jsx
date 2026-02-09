@@ -8,7 +8,7 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
     const trimmedDesc = description.trim()
     const body = {}
     if (trimmedDesc !== '') body.description = trimmedDesc
-    if (Object.keys(body).length == 0) return
+    if (Object.keys(body).length === 0) return
 
     setIsSubmitting(true)
     body.date = new Date(date).toISOString()
@@ -16,6 +16,7 @@ export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' 
       await createRecordFn(body)
       setDescription('')
     } catch (error) {
+      console.error('Failed to create record.', error)
       alert('Failed to create record. Please try again.')
     } finally {
       setIsSubmitting(false)
