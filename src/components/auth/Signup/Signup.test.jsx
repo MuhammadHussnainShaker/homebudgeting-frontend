@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import useUserStore from '../../../store/useUserStore'
-import Signup from './Signup'
+import useUserStore from '@/store/useUserStore'
+import Signup from '@/components/auth/Signup/Signup'
 
 describe('Signup', () => {
   beforeEach(() => {

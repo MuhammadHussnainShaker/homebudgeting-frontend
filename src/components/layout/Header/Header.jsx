@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router'
-import Container from '../container/Container'
-import useUserStore from '../../../store/useUserStore'
-import LogoutBtn from './LogoutBtn'
+import Container from '@/components/layout/container/Container'
+import useUserStore from '@/store/useUserStore'
+import LogoutBtn from '@/components/layout/Header/LogoutBtn'
 
 export default function Header() {
   const isAuthenticated = useUserStore((state) => state.user.isAuthenticated)

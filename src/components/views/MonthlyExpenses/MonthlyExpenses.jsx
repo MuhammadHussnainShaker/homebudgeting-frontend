@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { CreateDataItem, DataHeader, DataItem } from '../../data-items'
-import ErrorMessage from '../../ui/ErrorMessage'
+import { CreateDataItem, DataHeader, DataItem } from '@/components/data-items'
+import ErrorMessage from '@/components/ui/ErrorMessage'
 import { DEFAULT_MONTH } from '@/constants/dates'
 import { apiFetch } from '@/utils/apiFetch'
 import { calculateParentTotals } from '@/utils/calculations'

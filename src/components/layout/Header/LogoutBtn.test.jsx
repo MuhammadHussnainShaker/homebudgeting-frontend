@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import useUserStore from '../../../store/useUserStore'
-import LogoutBtn from './LogoutBtn'
+import useUserStore from '@/store/useUserStore'
+import LogoutBtn from '@/components/layout/Header/LogoutBtn'
 
 describe('LogoutBtn', () => {
   beforeEach(() => {

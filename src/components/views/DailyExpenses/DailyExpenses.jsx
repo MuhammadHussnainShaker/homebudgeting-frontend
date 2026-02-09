@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import ExpenseItem from './ExpenseItem'
-import CreateExpenseItem from './CreateExpenseItem'
+import ExpenseItem from '@/components/views/DailyExpenses/ExpenseItem'
+import CreateExpenseItem from '@/components/views/DailyExpenses/CreateExpenseItem'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import { apiFetch, apiFetchWithTextFallback } from '@/utils/apiFetch'
 import { sumBy } from '@/utils/calculations'

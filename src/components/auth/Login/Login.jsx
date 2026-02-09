@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import useUserStore from '../../../store/useUserStore'
-import ErrorMessage from '../../ui/ErrorMessage'
-import { apiFetch } from '../../../utils/apiFetch'
+import useUserStore from '@/store/useUserStore'
+import ErrorMessage from '@/components/ui/ErrorMessage'
+import { apiFetch } from '@/utils/apiFetch'
 
 export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState('')

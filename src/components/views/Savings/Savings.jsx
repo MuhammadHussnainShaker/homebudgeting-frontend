@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { DataHeader, DataItem, CreateDataItem } from '../../index'
-import ErrorMessage from '../../ui/ErrorMessage'
-import { DEFAULT_MONTH } from '../../../constants/dates'
-import { apiFetch } from '../../../utils/apiFetch'
-import { calculateProjectedActualTotals } from '../../../utils/calculations'
+import { DataHeader, DataItem, CreateDataItem } from '@/components'
+import ErrorMessage from '@/components/ui/ErrorMessage'
+import { DEFAULT_MONTH } from '@/constants/dates'
+import { apiFetch } from '@/utils/apiFetch'
+import { calculateProjectedActualTotals } from '@/utils/calculations'
 import {
   addItemToList,
   removeItemFromList,
   updateItemInList,
-} from '../../../utils/listStateUpdaters'
+} from '@/utils/listStateUpdaters'
 
 export default function Savings() {
   const [savings, setSavings] = useState([])

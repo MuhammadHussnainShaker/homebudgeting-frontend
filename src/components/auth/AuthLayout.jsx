@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router'
-import useUserStore from '../../store/useUserStore'
+import useUserStore from '@/store/useUserStore'
 
 export default function Protected({ authenticationRequired = true }) {
   const isAuthenticated = useUserStore((state) => state.user.isAuthenticated)
@@ -26,5 +26,4 @@ export default function Protected({ authenticationRequired = true }) {
 
   return <Outlet />
 }
-
 

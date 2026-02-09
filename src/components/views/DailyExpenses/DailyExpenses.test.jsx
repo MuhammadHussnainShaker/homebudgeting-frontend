@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import DailyExpenses from './DailyExpenses'
+import DailyExpenses from '@/components/views/DailyExpenses/DailyExpenses'
 
 describe('DailyExpenses', () => {
   afterEach(() => {
