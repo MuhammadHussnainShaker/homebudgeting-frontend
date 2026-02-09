@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import '@/index.css'
+import App from '@/App.jsx'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import {
   Home,
@@ -11,8 +11,8 @@ import {
   MonthlyExpenses,
   DailyExpenses,
   UserProfile,
-} from './pages/index.js'
-import { AuthLayout } from './components/index.js'
+} from '@/pages/index.js'
+import { AuthLayout } from '@/components/index.js'
 
 const root = document.getElementById('root')
 

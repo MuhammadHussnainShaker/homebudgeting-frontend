@@ -1,4 +1,4 @@
-import Container from '../container/Container'
+import Container from '@/components/layout/container/Container'
 
 export default function Footer() {
   return (

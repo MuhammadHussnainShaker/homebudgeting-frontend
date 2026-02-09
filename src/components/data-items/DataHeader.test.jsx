@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import DataHeader from './DataHeader'
+import DataHeader from '@/components/data-items/DataHeader'
 
 describe('DataHeader', () => {
   it('renders default columns without selectable', () => {
