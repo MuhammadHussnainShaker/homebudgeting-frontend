@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DataHeader, DataItem, CreateDataItem } from '@/components'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { DEFAULT_MONTH } from '@/constants/dates'
 import { apiFetch } from '@/utils/apiFetch'
 import { calculateProjectedActualTotals } from '@/utils/calculations'
 import {

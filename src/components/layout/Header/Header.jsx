@@ -50,7 +50,11 @@ export default function Header() {
                     name='budget-month'
                     id='budget-month'
                     value={isoDateToYYYYMM(month)}
-                    onChange={(e) => setMonth(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (!value) return
+                      setMonth(value)
+                    }}
                   />
                 </div>
               </li>
