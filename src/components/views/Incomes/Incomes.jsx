@@ -9,17 +9,19 @@ import {
   removeItemFromList,
   updateItemInList,
 } from '@/utils/listStateUpdaters'
+import useMonthStore from '@/store/useMonthStore'
 
 export default function Incomes() {
   const [incomes, setIncomes] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const totals = calculateProjectedActualTotals(incomes)
+  const month = useMonthStore((state) => state.month)
 
   useEffect(() => {
     async function fetchIncomes() {
       try {
-        const data = await apiFetch(`/api/v1/incomes/${DEFAULT_MONTH}`, {
+        const data = await apiFetch(`/api/v1/incomes/${month}`, {
           method: 'GET',
         })
         setIncomes(data.data)
@@ -32,7 +34,7 @@ export default function Incomes() {
     }
 
     fetchIncomes()
-  }, [])
+  }, [month])
 
   async function createIncome(body) {
     try {

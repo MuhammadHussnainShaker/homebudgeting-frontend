@@ -9,6 +9,7 @@ import {
   removeItemFromList,
   updateItemInList,
 } from '@/utils/listStateUpdaters'
+import useMonthStore from '@/store/useMonthStore'
 
 export default function MonthlyExpenses() {
   const [parentCategories, setParentCategories] = useState([])
@@ -16,16 +17,17 @@ export default function MonthlyExpenses() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const totals = calculateParentTotals(monthlyCatExpenses)
+  const month = useMonthStore((state) => state.month)
 
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true)
       try {
         const [parentData, expenseData] = await Promise.all([
-          apiFetch(`/api/v1/parent-categories/${DEFAULT_MONTH}`, {
+          apiFetch(`/api/v1/parent-categories/${month}`, {
             method: 'GET',
           }),
-          apiFetch(`/api/v1/monthly-categorical-expenses/${DEFAULT_MONTH}`, {
+          apiFetch(`/api/v1/monthly-categorical-expenses/${month}`, {
             method: 'GET',
           }),
         ])
@@ -33,7 +35,10 @@ export default function MonthlyExpenses() {
         setParentCategories(parentData.data)
         setMonthlyCatExpenses(expenseData.data)
       } catch (error) {
-        console.error('Error occurred while fetching monthly expense data', error)
+        console.error(
+          'Error occurred while fetching monthly expense data',
+          error,
+        )
         setError(error?.message)
       } finally {
         setIsLoading(false)
@@ -41,7 +46,7 @@ export default function MonthlyExpenses() {
     }
 
     fetchData()
-  }, [])
+  }, [month])
 
   async function createMonthlyCategoricalExpenses(body) {
     try {
@@ -62,10 +67,13 @@ export default function MonthlyExpenses() {
 
   async function updateMonthlyCategoricalExpense(id, body) {
     try {
-      const data = await apiFetch(`/api/v1/monthly-categorical-expenses/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(body),
-      })
+      const data = await apiFetch(
+        `/api/v1/monthly-categorical-expenses/${id}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(body),
+        },
+      )
       setMonthlyCatExpenses((prev) => updateItemInList(prev, data.data))
     } catch (error) {
       console.error(
@@ -80,7 +88,7 @@ export default function MonthlyExpenses() {
   async function toggleSelectableFn(id, body) {
     try {
       const data = await apiFetch(
-        `/api/v1/monthly-categorical-expenses/${id}/toggle-selectable/${DEFAULT_MONTH}`,
+        `/api/v1/monthly-categorical-expenses/${id}/toggle-selectable/${month}`,
         {
           method: 'PATCH',
           body: JSON.stringify(body),
@@ -128,7 +136,8 @@ export default function MonthlyExpenses() {
       {parentCategories.length > 0 &&
         parentCategories.map((parentCategory) => {
           const relevantExpenses = monthlyCatExpenses.filter(
-            (expense) => String(expense.parentId) === String(parentCategory._id),
+            (expense) =>
+              String(expense.parentId) === String(parentCategory._id),
           )
 
           const parentTotals = totals.byParent[String(parentCategory._id)] ?? {
@@ -144,10 +153,15 @@ export default function MonthlyExpenses() {
               </div>
 
               <div className='space-y-2 overflow-x-auto'>
-                <DataHeader sectionName={parentCategory.description} showSelectable={true} />
+                <DataHeader
+                  sectionName={parentCategory.description}
+                  showSelectable={true}
+                />
 
                 {relevantExpenses.length === 0 && (
-                  <p className='text-sm opacity-80'>No expenses recorded for this category.</p>
+                  <p className='text-sm opacity-80'>
+                    No expenses recorded for this category.
+                  </p>
                 )}
 
                 {relevantExpenses.length > 0 &&
@@ -181,8 +195,12 @@ export default function MonthlyExpenses() {
                   <div className='text-right'>
                     Projected: {parentTotals.projectedTotal}
                   </div>
-                  <div className='text-right'>Actual: {parentTotals.actualTotal}</div>
-                  <div className='text-right'>Difference: {parentTotals.difference}</div>
+                  <div className='text-right'>
+                    Actual: {parentTotals.actualTotal}
+                  </div>
+                  <div className='text-right'>
+                    Difference: {parentTotals.difference}
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,9 +211,13 @@ export default function MonthlyExpenses() {
         <div className='overflow-x-auto'>
           <div className='min-w-[720px] grid grid-cols-4 gap-2 px-2 py-2 border border-slate-700/50 rounded'>
             <div className='font-medium'>Grand Total</div>
-            <div className='text-right'>Projected: {totals.grand.projectedTotal}</div>
+            <div className='text-right'>
+              Projected: {totals.grand.projectedTotal}
+            </div>
             <div className='text-right'>Actual: {totals.grand.actualTotal}</div>
-            <div className='text-right'>Difference: {totals.grand.difference}</div>
+            <div className='text-right'>
+              Difference: {totals.grand.difference}
+            </div>
           </div>
         </div>
       )}
