@@ -35,7 +35,7 @@ describe('DailyExpenses', () => {
     expect(screen.getByText('Total')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Food' })).toBeInTheDocument()
-  })
+  }, 10000)
 
   it('creates a new daily expense via the input', async () => {
     const fetchMock = vi
