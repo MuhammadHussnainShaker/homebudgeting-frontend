@@ -9,7 +9,7 @@ import DataItem from './DataItem'
 import CreateDataItem from './CreateDataItem'
 import Incomes from './Incomes'
 import Savings from './Savings'
-import MonthlyExpenses from './MonthlyExpenses'
+import MonthlyExpenses from './MonthlyExpenses/MonthlyExpenses'
 import DailyExpenses from './DailyExpenses/DailyExpenses'
 
 export { AuthLayout, Signup, Container, Header, Footer, Login, Incomes, Savings, DataHeader, DataItem, CreateDataItem, MonthlyExpenses, DailyExpenses }
