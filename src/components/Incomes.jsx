@@ -1,32 +1,30 @@
 import { useEffect, useState } from 'react'
 import { DataHeader, DataItem, CreateDataItem } from './index'
+import ErrorMessage from './ErrorMessage'
+import { DEFAULT_MONTH } from '../constants/dates'
+import { apiFetch } from '../utils/apiFetch'
+import { calculateProjectedActualTotals } from '../utils/calculations'
+import {
+  addItemToList,
+  removeItemFromList,
+  updateItemInList,
+} from '../utils/listStateUpdaters'
 
 export default function Incomes() {
   const [incomes, setIncomes] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
-  const [totalProjAmount, setTotalProjAmount] = useState(0)
-  const [totalActAmount, setTotalActAmount] = useState(0)
-  const [totalDifference, setTotalDifference] = useState(0)
+  const totals = calculateProjectedActualTotals(incomes)
 
   useEffect(() => {
     async function fetchIncomes() {
       try {
-        const response = await fetch(
-          '/api/v1/incomes/2026-01-01T00:00:00.000Z',
-          {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-          },
-        )
-        const data = await response.json()
-        if (!response.ok || data.success === false) {
-          throw new Error(data.message || 'Fetching incomes failed')
-        }
+        const data = await apiFetch(`/api/v1/incomes/${DEFAULT_MONTH}`, {
+          method: 'GET',
+        })
         setIncomes(data.data)
       } catch (error) {
-        console.error('Following error occured while fetching incomes', error)
+        console.error('Error occurred while fetching incomes', error)
         setError(error?.message)
       } finally {
         setIsLoading(false)
@@ -36,38 +34,15 @@ export default function Incomes() {
     fetchIncomes()
   }, [])
 
-  useEffect(() => {
-    const { projTotal, actTotal } = incomes.reduce(
-      (acc, inc) => {
-        acc.projTotal += Number(inc.projectedAmount) || 0
-        acc.actTotal += Number(inc.actualAmount) || 0
-        return acc
-      },
-      { projTotal: 0, actTotal: 0 },
-    )
-    setTotalProjAmount(projTotal)
-    setTotalActAmount(actTotal)
-    setTotalDifference(actTotal - projTotal)
-  }, [incomes])
-
   async function createIncome(body) {
     try {
-      const response = await fetch('/api/v1/incomes', {
+      const data = await apiFetch('/api/v1/incomes', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const data = await response.json()
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Creating income record failed')
-      }
-      setIncomes((prev) => [...prev, data.data])
+      setIncomes((prev) => addItemToList(prev, data.data))
     } catch (error) {
-      console.error(
-        'Following error occured while creating income record:',
-        error,
-      )
+      console.error('Error occurred while creating income record:', error)
       setError(error?.message)
       throw error
     }
@@ -75,28 +50,13 @@ export default function Incomes() {
 
   async function updateIncome(id, body) {
     try {
-      const response = await fetch(`/api/v1/incomes/${id}`, {
+      const data = await apiFetch(`/api/v1/incomes/${id}`, {
         method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const data = await response.json()
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Updating income record failed')
-      }
-      setIncomes((prev) =>
-        prev.some((income) => income._id === data.data._id)
-          ? prev.map((income) =>
-              income._id === data.data._id ? data.data : income,
-            )
-          : [data.data, ...prev],
-      )
+      setIncomes((prev) => updateItemInList(prev, data.data))
     } catch (error) {
-      console.error(
-        'Following error occured while updating income record:',
-        error,
-      )
+      console.error('Error occurred while updating income record:', error)
       setError(error?.message)
       throw error
     }
@@ -104,21 +64,10 @@ export default function Incomes() {
 
   async function deleteIncome(id) {
     try {
-      const response = await fetch(`/api/v1/incomes/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      const data = await response.json()
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Deleting income record failed')
-      }
-      setIncomes((prev) => prev.filter((income) => income._id != id))
+      await apiFetch(`/api/v1/incomes/${id}`, { method: 'DELETE' })
+      setIncomes((prev) => removeItemFromList(prev, id))
     } catch (error) {
-      console.error(
-        'Following error occured while deleting income record:',
-        error,
-      )
+      console.error('Error occurred while deleting income record:', error)
       setError(error?.message)
       throw error
     }
@@ -132,7 +81,7 @@ export default function Incomes() {
         <h2 className='text-lg font-medium'>Incomes</h2>
       </div>
 
-      {error && <p className='text-red-500 text-sm'>{error}</p>}
+      <ErrorMessage message={error} />
 
       <div className='space-y-2 overflow-x-auto'>
         <DataHeader sectionName='Income' />
@@ -161,9 +110,9 @@ export default function Incomes() {
         <div className='min-w-[720px] grid grid-cols-[3rem_1fr_8rem_8rem_8rem] gap-2 px-2 py-2 border border-slate-700/50 rounded'>
           <div />
           <div className='font-medium'>Total</div>
-          <div className='text-right'>{totalProjAmount}</div>
-          <div className='text-right'>{totalActAmount}</div>
-          <div className='text-right'>{totalDifference}</div>
+          <div className='text-right'>{totals.projectedTotal}</div>
+          <div className='text-right'>{totals.actualTotal}</div>
+          <div className='text-right'>{totals.difference}</div>
         </div>
       </div>
     </section>

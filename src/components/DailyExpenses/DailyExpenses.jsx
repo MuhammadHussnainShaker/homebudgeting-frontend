@@ -1,17 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ExpenseItem from './ExpenseItem'
 import CreateExpenseItem from './CreateExpenseItem'
+import ErrorMessage from '../ErrorMessage'
+import { apiFetch, apiFetchWithTextFallback } from '../../utils/apiFetch'
+import { sumBy } from '../../utils/calculations'
+import {
+  addItemToList,
+  removeItemFromList,
+  updateItemInList,
+} from '../../utils/listStateUpdaters'
 
 export default function DailyExpenses() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
   const [dailyExpenses, setDailyExpenses] = useState([])
-  const totals = useMemo(() => {
-    const totalAmount = dailyExpenses.reduce(
-      (sum, exp) => sum + (Number(exp.amount) || 0),
-      0,
-    )
-    return { totalAmount }
-  }, [dailyExpenses])
+  const totals = { totalAmount: sumBy(dailyExpenses, 'amount') }
   const [selectableCategories, setSelectableCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -20,21 +22,13 @@ export default function DailyExpenses() {
     async function fetchDailyExpenses() {
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/v1/daily-expense?date=${date}`, {
+        const data = await apiFetch(`/api/v1/daily-expense?date=${date}`, {
           method: 'GET',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
         })
-        const data = await response.json()
-
-        if (!response.ok || data.success === false) {
-          throw new Error(data.message || 'Fetching daily-expenses failed')
-        }
-
         setDailyExpenses(data.data.dailyExpenses)
         setSelectableCategories(data.data.selectableCategoricalExpenses)
       } catch (error) {
-        console.error('Following error occured while fetching daily-expenses', error)
+        console.error('Error occurred while fetching daily-expenses', error)
         setError(error?.message)
       } finally {
         setIsLoading(false)
@@ -46,34 +40,13 @@ export default function DailyExpenses() {
 
   async function createDailyExpense(body) {
     try {
-      const response = await fetch('/api/v1/daily-expense', {
+      const data = await apiFetchWithTextFallback('/api/v1/daily-expense', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-
-      if (!response.ok) {
-        const text = await response.text()
-        let message = response.statusText || 'Request failed'
-        try {
-          const errJson = text ? JSON.parse(text) : null
-          message = errJson?.message ?? errJson?.error ?? message
-        } catch {
-          message = text || message
-        }
-        throw new Error(message)
-      }
-
-      const data = await response.json()
-
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Creating daily-expense record failed')
-      }
-
-      setDailyExpenses((prev) => [...prev, data.data])
+      setDailyExpenses((prev) => addItemToList(prev, data.data))
     } catch (error) {
-      console.error('Following error occured while creating daily-expense record', error)
+      console.error('Error occurred while creating daily-expense record', error)
       setError(error?.message)
       throw error
     }
@@ -81,25 +54,13 @@ export default function DailyExpenses() {
 
   async function updateDailyExpense(id, body) {
     try {
-      const response = await fetch(`/api/v1/daily-expense/${id}`, {
+      const data = await apiFetch(`/api/v1/daily-expense/${id}`, {
         method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const data = await response.json()
-
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Updating daily-expense record failed')
-      }
-
-      setDailyExpenses((prev) =>
-        prev.some((expense) => expense._id === data.data._id)
-          ? prev.map((expense) => (expense._id === data.data._id ? data.data : expense))
-          : [data.data, ...prev],
-      )
+      setDailyExpenses((prev) => updateItemInList(prev, data.data))
     } catch (error) {
-      console.error('Following error occured while updating daily-expense record:', error)
+      console.error('Error occurred while updating daily-expense record:', error)
       setError(error?.message)
       throw error
     }
@@ -107,20 +68,10 @@ export default function DailyExpenses() {
 
   async function deleteDailyExpense(id) {
     try {
-      const response = await fetch(`/api/v1/daily-expense/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      const data = await response.json()
-
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Deleting daily-expense record failed')
-      }
-
-      setDailyExpenses((prev) => prev.filter((expense) => expense._id != id))
+      await apiFetch(`/api/v1/daily-expense/${id}`, { method: 'DELETE' })
+      setDailyExpenses((prev) => removeItemFromList(prev, id))
     } catch (error) {
-      console.error('Following error occured while deleting daily-expense record:', error)
+      console.error('Error occurred while deleting daily-expense record:', error)
       setError(error?.message)
       throw error
     }
@@ -148,7 +99,7 @@ export default function DailyExpenses() {
         </div>
       </div>
 
-      {error && <p className='text-red-500 text-sm'>{error}</p>}
+      <ErrorMessage message={error} />
 
       <div className='space-y-2 overflow-x-auto'>
         <div className='min-w-[720px] grid grid-cols-[3rem_1fr_8rem_1fr] gap-2 px-2 py-2 text-sm font-medium border border-slate-700/50 rounded'>

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import useUserStore from '../store/useUserStore'
+import ErrorMessage from './ErrorMessage'
+import { apiFetch } from '../utils/apiFetch'
 
 export default function Signup() {
   const [displayName, setDisplayName] = useState('')
@@ -14,21 +16,13 @@ export default function Signup() {
     setError('')
 
     try {
-      const response = await fetch('/api/v1/users/register', {
+      const data = await apiFetch('/api/v1/users/register', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ displayName, phoneNumber }),
       })
-      const data = await response.json()
-
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Signup failed')
-      }
-
       login(data.data.user)
     } catch (error) {
-      console.error('Following error occured while submitting signup form', error)
+      console.error('Error occurred while submitting signup form', error)
       setError(error?.message)
     } finally {
       setIsSubmitting(false)
@@ -37,7 +31,7 @@ export default function Signup() {
 
   return (
     <div className='max-w-md mx-auto space-y-3'>
-      {error && <p className='text-red-500 text-sm'>{error}</p>}
+      <ErrorMessage message={error} />
 
       <form onSubmit={handleSubmit} className='space-y-3'>
         <div className='grid gap-1'>

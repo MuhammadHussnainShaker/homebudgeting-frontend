@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import LoadingSpinner from './LoadingSpinner'
+import { createKeyDownHandler } from '../utils/keyboard'
 
 export default function CreateDataItem({ createRecordFn, parentId = '' }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -24,10 +26,7 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
     }
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') e.target.blur()
-    else if (e.key === 'Escape') setDescription('')
-  }
+  const handleKeyDown = createKeyDownHandler(() => setDescription(''))
 
   const inputBase =
     'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
@@ -60,11 +59,7 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
           className={inputBase}
           placeholder='New item...'
         />
-        {isSubmitting && (
-          <div className='absolute right-2 top-1/2 -translate-y-1/2'>
-            <div className='h-4 w-4 animate-spin rounded-full border-2 border-slate-500 border-t-slate-200' />
-          </div>
-        )}
+        {isSubmitting && <LoadingSpinner />}
       </div>
 
       <div>

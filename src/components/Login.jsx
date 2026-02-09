@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import useUserStore from '../store/useUserStore'
+import ErrorMessage from './ErrorMessage'
+import { apiFetch } from '../utils/apiFetch'
 
 export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -13,21 +15,13 @@ export default function Login() {
     setError('')
 
     try {
-      const response = await fetch('/api/v1/users/login', {
+      const data = await apiFetch('/api/v1/users/login', {
         method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phoneNumber }),
       })
-      const data = await response.json()
-
-      if (!response.ok || data.success === false) {
-        throw new Error(data.message || 'Login failed')
-      }
-
       login(data.data.user)
     } catch (error) {
-      console.error('Following error occured while submitting login form', error)
+      console.error('Error occurred while submitting login form', error)
       setError(error?.message)
     } finally {
       setIsSubmitting(false)
@@ -36,7 +30,7 @@ export default function Login() {
 
   return (
     <div className='max-w-md mx-auto space-y-3'>
-      {error && <p className='text-red-500 text-sm'>{error}</p>}
+      <ErrorMessage message={error} />
 
       <form onSubmit={handleSubmit} className='space-y-3'>
         <div className='grid gap-1'>
