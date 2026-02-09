@@ -1,8 +1,16 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import Incomes from '@/components/views/Incomes/Incomes'
+import useMonthStore from '@/store/useMonthStore'
 
 describe('Incomes', () => {
+  const testMonth = '2026-04-01T00:00:00.000Z'
+
+  beforeEach(() => {
+    localStorage.clear()
+    useMonthStore.setState({ month: testMonth })
+  })
+
   afterEach(() => {
     vi.unstubAllGlobals()
   })
@@ -27,6 +35,10 @@ describe('Incomes', () => {
     render(<Incomes />)
 
     expect(await screen.findByDisplayValue('Salary')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/v1/incomes/${testMonth}`,
+      expect.any(Object),
+    )
     expect(screen.getByText('Total')).toBeInTheDocument()
 
     await waitFor(() => {

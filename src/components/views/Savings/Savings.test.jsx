@@ -1,8 +1,16 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import Savings from '@/components/views/Savings/Savings'
+import useMonthStore from '@/store/useMonthStore'
 
 describe('Savings', () => {
+  const testMonth = '2026-04-01T00:00:00.000Z'
+
+  beforeEach(() => {
+    localStorage.clear()
+    useMonthStore.setState({ month: testMonth })
+  })
+
   afterEach(() => {
     vi.unstubAllGlobals()
   })
@@ -27,6 +35,10 @@ describe('Savings', () => {
     render(<Savings />)
 
     expect(await screen.findByDisplayValue('Emergency Fund')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/v1/savings/${testMonth}`,
+      expect.any(Object),
+    )
     expect(screen.getByText('Total')).toBeInTheDocument()
 
     await waitFor(() => {
