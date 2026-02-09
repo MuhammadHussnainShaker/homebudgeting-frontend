@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import CreateExpenseItem from './CreateExpenseItem'
+import CreateExpenseItem from '@/components/views/DailyExpenses/CreateExpenseItem'
 
 describe('CreateExpenseItem', () => {
   beforeEach(() => {

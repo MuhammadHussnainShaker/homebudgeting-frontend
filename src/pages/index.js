@@ -1,10 +1,10 @@
-import Home from './Home'
-import Signup from './Signup'
-import Login from './Login'
-import Dashboard from './Dashboard'
-import MonthlyExpenses from './MonthlyExpenses'
-import DailyExpenses from './DailyExpenses'
-import UserProfile from './UserProfile'
+import Home from '@/pages/Home'
+import Signup from '@/pages/Signup'
+import Login from '@/pages/Login'
+import Dashboard from '@/pages/Dashboard'
+import MonthlyExpenses from '@/pages/MonthlyExpenses'
+import DailyExpenses from '@/pages/DailyExpenses'
+import UserProfile from '@/pages/UserProfile'
 
 export {
   Home,

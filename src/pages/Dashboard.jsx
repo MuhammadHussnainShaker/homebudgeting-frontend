@@ -1,4 +1,4 @@
-import { Incomes, Savings, Container } from '../components'
+import { Incomes, Savings, Container } from '@/components'
 
 export default function Dashboard() {
   return (

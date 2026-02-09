@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import Container from './Container'
+import Container from '@/components/layout/container/Container'
 
 describe('Container', () => {
   it('renders children inside wrapper', () => {

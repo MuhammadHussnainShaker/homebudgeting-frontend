@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import LoadingSpinner from '../../ui/LoadingSpinner'
-import { createKeyDownHandler } from '../../../utils/keyboard'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { createKeyDownHandler } from '@/utils/keyboard'
 
 export default function CreateExpenseItem({ createRecordFn, date = '2026-01-20' }) {
   const [isSubmitting, setIsSubmitting] = useState(false)

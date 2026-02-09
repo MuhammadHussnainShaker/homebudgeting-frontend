@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import MonthlyExpenses from './MonthlyExpenses'
+import MonthlyExpenses from '@/components/views/MonthlyExpenses/MonthlyExpenses'
 
 describe('MonthlyExpenses', () => {
   afterEach(() => {

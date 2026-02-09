@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import DataItem from './DataItem'
+import DataItem from '@/components/data-items/DataItem'
 
 describe('DataItem', () => {
   beforeEach(() => {
