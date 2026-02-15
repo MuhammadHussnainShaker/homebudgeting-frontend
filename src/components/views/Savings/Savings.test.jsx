@@ -18,6 +18,9 @@ describe('Savings', () => {
   it('renders fetched savings and totals', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+      },
       json: vi.fn().mockResolvedValue({
         success: true,
         data: [
@@ -54,6 +57,9 @@ describe('Savings', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: [
@@ -68,6 +74,9 @@ describe('Savings', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: {
@@ -80,6 +89,9 @@ describe('Savings', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: {
@@ -92,6 +104,9 @@ describe('Savings', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: { _id: 's2' },

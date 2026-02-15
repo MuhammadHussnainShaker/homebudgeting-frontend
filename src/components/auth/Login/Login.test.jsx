@@ -17,6 +17,9 @@ describe('Login', () => {
     const user = { _id: 'u1', displayName: 'Ali', isActive: true }
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+      },
       json: vi.fn().mockResolvedValue({ success: true, data: { user } }),
     })
     vi.stubGlobal('fetch', fetchMock)
@@ -46,10 +49,13 @@ describe('Login', () => {
   it('renders API error message on failure', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
-      json: vi.fn().mockResolvedValue({
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+      },
+      text: vi.fn().mockResolvedValue(JSON.stringify({
         success: false,
         message: 'Invalid credentials',
-      }),
+      })),
     })
     vi.stubGlobal('fetch', fetchMock)
 
