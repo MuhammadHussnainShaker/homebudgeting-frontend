@@ -10,6 +10,8 @@ import {
 } from './monthlyExpensesCRUDFuncs'
 import useMonthStore from '@/store/useMonthStore'
 import RenderMonthlyExpenseItems from './RenderMonthlyExpenseItems'
+import { CreateDataItem } from '@/components/data-items'
+import { createParentCategory } from './parentCategoryCRUDFuncs'
 
 export default function MonthlyExpenses() {
   const [parentCategories, setParentCategories] = useState([])
@@ -31,7 +33,10 @@ export default function MonthlyExpenses() {
 
   const renderMonthlyExpenseItemProps = {
     parentCategories,
+    setParentCategories,
     monthlyCatExpenses,
+    setMonthlyCatExpenses,
+    setError,
     totals,
     toggleSelectableFn,
     deleteMonthlyCategoricalExpense,
@@ -50,6 +55,13 @@ export default function MonthlyExpenses() {
       <ErrorMessage message={error} />
 
       <RenderMonthlyExpenseItems {...renderMonthlyExpenseItemProps} />
+
+      <CreateDataItem
+        placeholder='Add new parent category'
+        createRecordFn={createParentCategory}
+        setRecordFn={setParentCategories}
+        setError={setError}
+      />
 
       {parentCategories.length > 0 && (
         <div className='overflow-x-auto'>

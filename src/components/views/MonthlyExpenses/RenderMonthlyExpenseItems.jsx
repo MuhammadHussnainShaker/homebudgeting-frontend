@@ -1,8 +1,12 @@
-import { CreateDataItem, DataHeader, DataItem } from '@/components/data-items'
+import { CreateDataItem, DataItem } from '@/components/data-items'
+import MonthlyExpenseItemsDataHeader from './MonthlyExpenseItemsDataHeader'
 
 export default function RenderMonthlyExpenseItems({
   parentCategories,
+  setParentCategories = async () => {},
   monthlyCatExpenses,
+  setMonthlyCatExpenses = async () => {},
+  setError = async () => {},
   totals,
   toggleSelectableFn,
   deleteMonthlyCategoricalExpense,
@@ -28,15 +32,13 @@ export default function RenderMonthlyExpenseItems({
 
           return (
             <div key={parentCategory._id} className='space-y-2'>
-              {/* <div className='flex items-center justify-between'>
-              <h3 className='font-medium'>{parentCategory.description}</h3>
-            </div> */}
 
               <div className='space-y-2 overflow-x-auto'>
-                <DataHeader
-                  sectionName={parentCategory.description}
-                  showSelectable={true}
-                  isEditable={true}
+                <MonthlyExpenseItemsDataHeader
+                  id={parentCategory._id}
+                  description={parentCategory.description}
+                  setRecordFn={setParentCategories}
+                  setError={setError}
                 />
 
                 {relevantExpenses.length === 0 && (
@@ -61,12 +63,16 @@ export default function RenderMonthlyExpenseItems({
                       toggleSelectableFn={toggleSelectableFn}
                       deleteRecordFn={deleteMonthlyCategoricalExpense}
                       updateRecordFn={updateMonthlyCategoricalExpense}
+                      setRecordFn={setMonthlyCatExpenses}
+                      setError={setError}
                     />
                   ))}
 
                 <CreateDataItem
                   createRecordFn={createMonthlyCategoricalExpenses}
                   parentId={parentCategory._id}
+                  setRecordFn={setMonthlyCatExpenses}
+                  setError={setError}
                 />
               </div>
 
