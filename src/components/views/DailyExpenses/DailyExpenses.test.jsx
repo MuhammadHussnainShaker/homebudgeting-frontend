@@ -10,6 +10,9 @@ describe('DailyExpenses', () => {
   it('renders fetched expenses and totals', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
+      headers: {
+        get: vi.fn().mockReturnValue('application/json'),
+      },
       json: vi.fn().mockResolvedValue({
         success: true,
         data: {
@@ -42,6 +45,9 @@ describe('DailyExpenses', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: { dailyExpenses: [], selectableCategoricalExpenses: [] },
@@ -49,6 +55,9 @@ describe('DailyExpenses', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: { _id: 'd2', description: 'Taxi', amount: 12 },
