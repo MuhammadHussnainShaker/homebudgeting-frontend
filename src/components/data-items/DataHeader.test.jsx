@@ -13,15 +13,15 @@ describe('DataHeader', () => {
     )
   })
 
-  it('renders selectable column when enabled', () => {
+  it('renders with custom section name and class', () => {
     const { container } = render(
-      <DataHeader sectionName='Housing' showSelectable={true} className='custom' />,
+      <DataHeader sectionName='Housing' className='custom' />,
     )
 
     expect(screen.getByText('Housing')).toBeInTheDocument()
-    expect(screen.getByText('Selectable')).toBeInTheDocument()
+    expect(screen.queryByText('Selectable')).not.toBeInTheDocument()
     expect(container.firstChild).toHaveClass(
-      'grid-cols-[3rem_1fr_8rem_8rem_8rem_7rem]',
+      'grid-cols-[3rem_1fr_8rem_8rem_8rem]',
       'custom',
     )
   })

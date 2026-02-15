@@ -57,7 +57,7 @@ describe('RenderMonthlyExpenseItems', () => {
       />,
     )
 
-    expect(screen.getByText('Housing')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Housing')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Rent')).toBeInTheDocument()
     expect(screen.getByText('Projected: 1000')).toBeInTheDocument()
     expect(screen.getByText('Actual: 900')).toBeInTheDocument()
@@ -86,7 +86,7 @@ describe('RenderMonthlyExpenseItems', () => {
       />,
     )
 
-    expect(screen.getByText('Transport')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Transport')).toBeInTheDocument()
     expect(
       screen.getByText('No expenses recorded for this category.'),
     ).toBeInTheDocument()
@@ -135,8 +135,8 @@ describe('RenderMonthlyExpenseItems', () => {
       />,
     )
 
-    expect(screen.getByText('Housing')).toBeInTheDocument()
-    expect(screen.getByText('Transport')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Housing')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Transport')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Rent')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Fuel')).toBeInTheDocument()
   })
@@ -217,7 +217,7 @@ describe('RenderMonthlyExpenseItems', () => {
       />,
     )
 
-    expect(screen.getByText('Entertainment')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Entertainment')).toBeInTheDocument()
     expect(screen.getByText('Projected: 0')).toBeInTheDocument()
     expect(screen.getByText('Actual: 0')).toBeInTheDocument()
     expect(screen.getByText('Difference: 0')).toBeInTheDocument()
