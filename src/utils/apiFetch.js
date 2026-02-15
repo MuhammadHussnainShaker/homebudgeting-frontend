@@ -12,9 +12,13 @@ function buildFallbackMessage(url) {
   return `Request to ${url} failed`
 }
 
-async function parseErrorMessage(response, fallback) {
+async function parseErrorMessage(response, contentType, fallback) {
   const text = await response.text()
-  let message = fallback || response.statusText || 'Request failed'
+  if (contentType && contentType.includes('text/html')) {
+    const errorText = htmlErrorParser(text)
+    return errorText
+  }
+  let message = response.statusText || fallback || 'Request failed'
 
   if (!text) return message
 
@@ -28,28 +32,31 @@ async function parseErrorMessage(response, fallback) {
 
 export async function apiFetch(url, options = {}) {
   const response = await fetch(url, buildFetchOptions(options))
-  const data = await response.json()
-
-  if (!response.ok || data?.success === false) {
-    throw new Error(data?.message || data?.error || buildFallbackMessage(url))
-  }
-
-  return data
-}
-
-export async function apiFetchWithTextFallback(url, options = {}) {
-  const response = await fetch(url, buildFetchOptions(options))
+  const contentType = response.headers.get('content-type')
 
   if (!response.ok) {
-    const message = await parseErrorMessage(response, buildFallbackMessage(url))
+    const message = await parseErrorMessage(
+      response,
+      contentType,
+      buildFallbackMessage(url),
+    )
     throw new Error(message)
   }
 
-  const data = await response.json()
-
-  if (data?.success === false) {
-    throw new Error(data?.message || data?.error || buildFallbackMessage(url))
+  if (contentType && contentType.includes('application/json')) {
+    const data = await response.json()
+    if (data?.success === false) {
+      throw new Error(data?.message || data?.error || buildFallbackMessage(url))
+    }
+    return data
   }
 
-  return data
+  return await response.text()
+}
+
+function htmlErrorParser(textRes) {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(textRes, 'text/html')
+  const preTag = doc.querySelector('pre')
+  return preTag ? preTag.textContent : 'An unexpected server error occurred.'
 }
