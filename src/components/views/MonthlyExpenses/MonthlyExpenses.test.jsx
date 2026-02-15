@@ -20,6 +20,9 @@ describe('MonthlyExpenses', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: [{ _id: 'p1', description: 'Housing' }],
@@ -27,6 +30,9 @@ describe('MonthlyExpenses', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({
           success: true,
           data: [
@@ -67,10 +73,16 @@ describe('MonthlyExpenses', () => {
       .fn()
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({ success: true, data: [] }),
       })
       .mockResolvedValueOnce({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({ success: true, data: [] }),
       })
     vi.stubGlobal('fetch', fetchMock)

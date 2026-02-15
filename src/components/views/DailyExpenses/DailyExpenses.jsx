@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ExpenseItem from '@/components/views/DailyExpenses/ExpenseItem'
 import CreateExpenseItem from '@/components/views/DailyExpenses/CreateExpenseItem'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { apiFetch, apiFetchWithTextFallback } from '@/utils/apiFetch'
+import { apiFetch } from '@/utils/apiFetch'
 import { sumBy } from '@/utils/calculations'
 import {
   addItemToList,
@@ -40,7 +40,7 @@ export default function DailyExpenses() {
 
   async function createDailyExpense(body) {
     try {
-      const data = await apiFetchWithTextFallback('/api/v1/daily-expense', {
+      const data = await apiFetch('/api/v1/daily-expense', {
         method: 'POST',
         body: JSON.stringify(body),
       })

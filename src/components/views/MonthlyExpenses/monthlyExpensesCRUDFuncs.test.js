@@ -36,10 +36,16 @@ describe('monthlyExpensesCRUDFuncs', () => {
         .fn()
         .mockResolvedValueOnce({
           ok: true,
+          headers: {
+            get: vi.fn().mockReturnValue('application/json'),
+          },
           json: vi.fn().mockResolvedValue({ success: true, ...mockParentData }),
         })
         .mockResolvedValueOnce({
           ok: true,
+          headers: {
+            get: vi.fn().mockReturnValue('application/json'),
+          },
           json: vi.fn().mockResolvedValue({ success: true, ...mockExpenseData }),
         })
 
@@ -101,6 +107,9 @@ describe('monthlyExpensesCRUDFuncs', () => {
 
       const fetchMock = vi.fn().mockResolvedValue({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi
           .fn()
           .mockResolvedValue({ success: true, data: newExpense }),
@@ -124,10 +133,13 @@ describe('monthlyExpensesCRUDFuncs', () => {
     it('handles create errors and sets error message', async () => {
       const fetchMock = vi.fn().mockResolvedValue({
         ok: false,
-        json: vi.fn().mockResolvedValue({
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           success: false,
           message: 'Creation failed',
-        }),
+        })),
       })
       vi.stubGlobal('fetch', fetchMock)
 
@@ -158,6 +170,9 @@ describe('monthlyExpensesCRUDFuncs', () => {
 
       const fetchMock = vi.fn().mockResolvedValue({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi
           .fn()
           .mockResolvedValue({ success: true, data: updatedExpense }),
@@ -177,10 +192,13 @@ describe('monthlyExpensesCRUDFuncs', () => {
     it('handles update errors and sets error message', async () => {
       const fetchMock = vi.fn().mockResolvedValue({
         ok: false,
-        json: vi.fn().mockResolvedValue({
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           success: false,
           message: 'Update failed',
-        }),
+        })),
       })
       vi.stubGlobal('fetch', fetchMock)
 
@@ -207,6 +225,9 @@ describe('monthlyExpensesCRUDFuncs', () => {
 
       const fetchMock = vi.fn().mockResolvedValue({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi
           .fn()
           .mockResolvedValue({ success: true, data: { record: updatedExpense } }),
@@ -231,10 +252,13 @@ describe('monthlyExpensesCRUDFuncs', () => {
     it('handles toggle errors and sets error message', async () => {
       const fetchMock = vi.fn().mockResolvedValue({
         ok: false,
-        json: vi.fn().mockResolvedValue({
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           success: false,
           message: 'Toggle failed',
-        }),
+        })),
       })
       vi.stubGlobal('fetch', fetchMock)
 
@@ -255,6 +279,9 @@ describe('monthlyExpensesCRUDFuncs', () => {
     it('deletes an expense successfully', async () => {
       const fetchMock = vi.fn().mockResolvedValue({
         ok: true,
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
         json: vi.fn().mockResolvedValue({ success: true }),
       })
       vi.stubGlobal('fetch', fetchMock)
@@ -271,10 +298,13 @@ describe('monthlyExpensesCRUDFuncs', () => {
     it('handles delete errors and sets error message', async () => {
       const fetchMock = vi.fn().mockResolvedValue({
         ok: false,
-        json: vi.fn().mockResolvedValue({
+        headers: {
+          get: vi.fn().mockReturnValue('application/json'),
+        },
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           success: false,
           message: 'Delete failed',
-        }),
+        })),
       })
       vi.stubGlobal('fetch', fetchMock)
 
