@@ -54,9 +54,8 @@ describe('MonthlyExpenses', () => {
       `/api/v1/monthly-categorical-expenses/${testMonth}`,
       expect.any(Object),
     )
-    expect(screen.getByRole('heading', { name: 'Housing' })).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Housing')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Rent')).toBeInTheDocument()
-    expect(screen.getByText('Selectable')).toBeInTheDocument()
 
     expect(screen.getAllByText('Projected: 1000')).toHaveLength(2)
     expect(screen.getAllByText('Actual: 900')).toHaveLength(2)

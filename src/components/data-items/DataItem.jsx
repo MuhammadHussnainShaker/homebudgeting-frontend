@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import SelectableCheckbox from '@/components/views/MonthlyExpenses/SelectableCheckbox'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { calculateDifference, toNumber } from '@/utils/calculations'
 import { createKeyDownHandler } from '@/utils/keyboard'
@@ -12,11 +11,10 @@ export default function DataItem({
   actualAmount: initialActualAmount = 0,
   projMinusActual = true,
   isActualDisabled = false,
-  showSelectable = false,
-  initialSelectable = false,
-  toggleSelectableFn = async () => {},
   updateRecordFn = async () => {},
   deleteRecordFn = async () => {},
+  setRecordFn = async () => {},
+  setError = async () => {},
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState(initialDescription)
@@ -40,7 +38,7 @@ export default function DataItem({
       )
       if (deleteRecord) {
         try {
-          await deleteRecordFn(id)
+          await deleteRecordFn(id, setRecordFn, setError)
         } catch (error) {
           console.error('Failed to delete data item record.', error)
           setDescription(initialDescription)
@@ -64,7 +62,7 @@ export default function DataItem({
 
     setIsSubmitting(true)
     try {
-      await updateRecordFn(id, body)
+      await updateRecordFn(id, body, setRecordFn, setError)
     } catch (error) {
       console.error('Failed to update data item record.', error)
       setDescription(initialDescription)
@@ -84,11 +82,13 @@ export default function DataItem({
 
   const handleKeyDown = createKeyDownHandler(resetValues)
 
-  const diffValue = calculateDifference(projAmount, actualAmount, projMinusActual)
+  const diffValue = calculateDifference(
+    projAmount,
+    actualAmount,
+    projMinusActual,
+  )
 
-  const gridCols = showSelectable
-    ? 'grid-cols-[3rem_1fr_8rem_8rem_8rem_7rem]'
-    : 'grid-cols-[3rem_1fr_8rem_8rem_8rem]'
+  const gridCols = 'grid-cols-[3rem_1fr_8rem_8rem_8rem]'
 
   const inputBase =
     'w-full rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
@@ -121,7 +121,9 @@ export default function DataItem({
           onKeyDown={handleKeyDown}
           className={inputBase}
         />
-        {isSubmitting && description !== initialDescription && <LoadingSpinner />}
+        {isSubmitting && description !== initialDescription && (
+          <LoadingSpinner />
+        )}
       </div>
 
       <div className='relative'>
@@ -157,7 +159,9 @@ export default function DataItem({
           onKeyDown={handleKeyDown}
           className={[inputBase, 'text-right'].join(' ')}
         />
-        {isSubmitting && actualAmount != initialActualAmount && <LoadingSpinner />}
+        {isSubmitting && actualAmount != initialActualAmount && (
+          <LoadingSpinner />
+        )}
       </div>
 
       <div>
@@ -173,16 +177,6 @@ export default function DataItem({
           className={[inputBase, 'text-right opacity-80'].join(' ')}
         />
       </div>
-
-      {showSelectable && (
-        <div className='flex items-center justify-center'>
-          <SelectableCheckbox
-            id={id}
-            initialSelectable={initialSelectable}
-            toggleSelectableFn={toggleSelectableFn}
-          />
-        </div>
-      )}
     </div>
   )
 }

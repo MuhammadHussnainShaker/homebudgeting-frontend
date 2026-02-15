@@ -1,10 +1,18 @@
 import { useState } from 'react'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { createKeyDownHandler } from '@/utils/keyboard'
+import useMonthStore from '@/store/useMonthStore'
 
-export default function CreateDataItem({ createRecordFn, parentId = '' }) {
+export default function CreateDataItem({
+  createRecordFn = async () => {},
+  parentId = '',
+  placeholder = 'New item...',
+  setRecordFn = async () => {},
+  setError = async () => {},
+}) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [description, setDescription] = useState('')
+  const month = useMonthStore((state) => state.month)
 
   async function handleBlur() {
     const trimmedDesc = description.trim()
@@ -13,10 +21,10 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
     if (Object.keys(body).length === 0) return
 
     setIsSubmitting(true)
-    body.month = new Date().toISOString()
+    body.month = month
     if (parentId) body.parentId = parentId
     try {
-      await createRecordFn(body)
+      await createRecordFn(body, setRecordFn, setError)
       setDescription('')
     } catch (error) {
       console.error('Failed to create data item record.', error)
@@ -57,20 +65,34 @@ export default function CreateDataItem({ createRecordFn, parentId = '' }) {
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           className={inputBase}
-          placeholder='New item...'
+          placeholder={placeholder}
         />
         {isSubmitting && <LoadingSpinner />}
       </div>
 
-      <div>
-        <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
+      {/* Commenting out below inputs because I thought they are un-necessary
+      but don't deleting them thinking we might uncomment them in the future.  */}
+      {/* <div>
+        <input
+          type='number'
+          disabled
+          className={[inputBase, 'text-right opacity-60'].join(' ')}
+        />
       </div>
       <div>
-        <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
+        <input
+          type='number'
+          disabled
+          className={[inputBase, 'text-right opacity-60'].join(' ')}
+        />
       </div>
       <div>
-        <input type='number' disabled className={[inputBase, 'text-right opacity-60'].join(' ')} />
-      </div>
+        <input
+          type='number'
+          disabled
+          className={[inputBase, 'text-right opacity-60'].join(' ')}
+        />
+      </div> */}
     </div>
   )
 }
