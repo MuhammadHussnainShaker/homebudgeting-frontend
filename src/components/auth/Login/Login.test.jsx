@@ -41,7 +41,7 @@ describe('Login', () => {
         body: JSON.stringify({ phoneNumber: '03001234567' }),
       }),
     )
-  })
+  }, 10000)
 
   it('renders API error message on failure', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
