@@ -1,16 +1,17 @@
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useLocation } from 'react-router'
 import Container from '@/components/layout/container/Container'
 import useUserStore from '@/store/useUserStore'
 import LogoutBtn from '@/components/layout/Header/LogoutBtn'
 import useMonthStore from '@/store/useMonthStore'
 import isoDateToYYYYMM from '@/utils/date-manipulators/isoDateToYYYYMM'
 
-
 export default function Header() {
   const isAuthenticated = useUserStore((state) => state.user.isAuthenticated)
   const month = useMonthStore((state) => state.month)
   const setMonth = useMonthStore((state) => state.setMonth)
   const navigate = useNavigate()
+  const isDailyExpenseActive =
+    useLocation().pathname.startsWith('/daily-expenses')
 
   const navItems = [
     { name: 'Signup', slug: '/signup', active: !isAuthenticated },
@@ -40,23 +41,25 @@ export default function Header() {
           <ul className='flex flex-wrap items-center justify-end gap-2'>
             {isAuthenticated && (
               <li>
-                <div className='flex items-center gap-2'>
-                  <label className='text-sm' htmlFor='budget-month'>
-                    Month
-                  </label>
-                  <input
-                    className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-                    type='month'
-                    name='budget-month'
-                    id='budget-month'
-                    value={isoDateToYYYYMM(month)}
-                    onChange={(e) => {
-                      const value = e.target.value
-                      if (!value) return
-                      setMonth(value)
-                    }}
-                  />
-                </div>
+                {!isDailyExpenseActive && (
+                  <div className='flex items-center gap-2'>
+                    <label className='text-sm sr-only' htmlFor='budget-month'>
+                      Month
+                    </label>
+                    <input
+                      className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
+                      type='month'
+                      name='budget-month'
+                      id='budget-month'
+                      value={isoDateToYYYYMM(month)}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        if (!value) return
+                        setMonth(value)
+                      }}
+                    />
+                  </div>
+                )}
               </li>
             )}
             {navItems.map((item) =>
