@@ -49,7 +49,7 @@ export default function Login() {
 
       // Check if email is verified
       if (!user.emailVerified) {
-        setError('Please verify your email address before logging in.')
+        setError('Please verify your email address before logging in. Check your inbox for the verification link.')
         setShowResend(true)
         
         // Sign out the unverified user
