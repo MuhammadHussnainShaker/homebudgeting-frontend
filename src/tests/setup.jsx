@@ -33,6 +33,11 @@ vi.mock('@firebase-oss/ui-core', () => ({
 
 vi.mock('@firebase-oss/ui-react', () => ({
   FirebaseUIProvider: ({ children }) => children,
-  useFirebaseUIWidget: vi.fn(() => [{ current: null }]),
+  SignUpAuthScreen: ({ onSignUp }) => (
+    <div data-testid="signup-screen">SignUp Screen</div>
+  ),
+  SignInAuthScreen: ({ onSignIn }) => (
+    <div data-testid="signin-screen">SignIn Screen</div>
+  ),
 }))
 

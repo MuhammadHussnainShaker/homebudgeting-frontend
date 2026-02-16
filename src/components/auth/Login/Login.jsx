@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useFirebaseUIWidget } from '@firebase-oss/ui-react'
-import { EmailAuthProvider, sendEmailVerification } from 'firebase/auth'
+import { SignInAuthScreen } from '@firebase-oss/ui-react'
+import { sendEmailVerification } from 'firebase/auth'
 import { auth } from '@/services/firebase/firebaseClient'
 import useUserStore from '@/store/useUserStore'
 import ErrorMessage from '@/components/ui/ErrorMessage'
@@ -43,64 +43,41 @@ export default function Login() {
     }
   }
 
-  const uiConfig = {
-    signInOptions: [
-      {
-        provider: EmailAuthProvider.PROVIDER_ID,
-        requireDisplayName: false,
-        signInMethod: EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
-      },
-    ],
-    callbacks: {
-      signInSuccessWithAuthResult: async (authResult) => {
-        try {
-          const user = authResult.user
+  const handleSignIn = async (credential) => {
+    try {
+      const user = credential.user
 
-          // Check if email is verified
-          if (!user.emailVerified) {
-            setError('Please verify your email address before logging in.')
-            setShowResend(true)
-            
-            // Sign out the unverified user
-            await auth.signOut()
-            return false
-          }
+      // Check if email is verified
+      if (!user.emailVerified) {
+        setError('Please verify your email address before logging in.')
+        setShowResend(true)
+        
+        // Sign out the unverified user
+        await auth.signOut()
+        return
+      }
 
-          // Email is verified - call backend bootstrap
-          try {
-            const response = await apiAuthFetch('/api/v1/auth/bootstrap', {
-              method: 'POST',
-            })
+      // Email is verified - call backend bootstrap
+      try {
+        const response = await apiAuthFetch('/api/v1/auth/bootstrap', {
+          method: 'POST',
+        })
 
-            // Store the backend user profile
-            login(response.data.user)
+        // Store the backend user profile
+        login(response.data.user)
 
-            // Navigate to dashboard
-            navigate('/dashboard')
-          } catch (err) {
-            console.error('Error bootstrapping user:', err)
-            setError(err?.message || 'Failed to initialize user account')
-            await auth.signOut()
-          }
-        } catch (err) {
-          console.error('Error during login:', err)
-          setError(err?.message || 'Login failed')
-        }
-
-        // Return false to prevent FirebaseUI from handling the redirect
-        return false
-      },
-      signInFailure: (error) => {
-        console.error('Login failed:', error)
-        setError(error?.message || 'Login failed')
-        setShowResend(false)
-      },
-    },
-    credentialHelper: 'none',
-    autoUpgradeAnonymousUsers: false,
+        // Navigate to dashboard
+        navigate('/dashboard')
+      } catch (err) {
+        console.error('Error bootstrapping user:', err)
+        setError(err?.message || 'Failed to initialize user account')
+        await auth.signOut()
+      }
+    } catch (err) {
+      console.error('Error during login:', err)
+      setError(err?.message || 'Login failed')
+    }
   }
-
-  const [containerRef] = useFirebaseUIWidget(auth, uiConfig)
 
   return (
     <div className='max-w-md mx-auto space-y-3'>
@@ -124,7 +101,7 @@ export default function Login() {
         </p>
       )}
       
-      <div ref={containerRef} />
+      <SignInAuthScreen onSignIn={handleSignIn} />
     </div>
   )
 }
