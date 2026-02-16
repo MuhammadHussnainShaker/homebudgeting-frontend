@@ -13,31 +13,35 @@ import {
   UserProfile,
 } from '@/pages/index.js'
 import { AuthLayout } from '@/components/index.js'
+import { FirebaseUIProvider } from '@firebase-oss/ui-react'
+import { ui } from '@/services/firebase/firebaseClient'
 
 const root = document.getElementById('root')
 
 createRoot(root).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<App />}>
-          <Route index element={<Home />} />
+    <FirebaseUIProvider ui={ui}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<App />}>
+            <Route index element={<Home />} />
 
-          {/* Public routes */}
-          <Route element={<AuthLayout authenticationRequired={false} />}>
-            <Route path='/signup' element={<Signup />} />
-            <Route path='/login' element={<Login />} />
-          </Route>
+            {/* Public routes */}
+            <Route element={<AuthLayout authenticationRequired={false} />}>
+              <Route path='/signup' element={<Signup />} />
+              <Route path='/login' element={<Login />} />
+            </Route>
 
-          {/* Private routes */}
-          <Route element={<AuthLayout authenticationRequired={true} />}>
-            <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/monthly-expenses' element={<MonthlyExpenses />} />
-            <Route path='/daily-expenses' element={<DailyExpenses />} />
-            <Route path='/user-profile' element={<UserProfile />} />
+            {/* Private routes */}
+            <Route element={<AuthLayout authenticationRequired={true} />}>
+              <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/monthly-expenses' element={<MonthlyExpenses />} />
+              <Route path='/daily-expenses' element={<DailyExpenses />} />
+              <Route path='/user-profile' element={<UserProfile />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </FirebaseUIProvider>
   </StrictMode>,
 )
