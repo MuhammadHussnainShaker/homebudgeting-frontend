@@ -1,62 +1,130 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { useFirebaseUIWidget } from '@firebase-oss/ui-react'
+import { EmailAuthProvider, sendEmailVerification } from 'firebase/auth'
+import { auth } from '@/services/firebase/firebaseClient'
 import useUserStore from '@/store/useUserStore'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { apiFetch } from '@/utils/apiFetch'
+import { apiAuthFetch } from '@/utils/apiAuthFetch'
 
 export default function Login() {
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [isResending, setIsResending] = useState(false)
+  const [showResend, setShowResend] = useState(false)
+  const navigate = useNavigate()
   const login = useUserStore((state) => state.login)
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleResendVerification = async () => {
+    setIsResending(true)
     setError('')
-
+    
     try {
-      const data = await apiFetch('/api/v1/users/login', {
-        method: 'POST',
-        body: JSON.stringify({ phoneNumber }),
+      const user = auth.currentUser
+      if (!user) {
+        setError('No user is currently signed in')
+        return
+      }
+
+      const verificationUrl = import.meta.env.DEV
+        ? 'http://localhost:5173/login'
+        : `${window.location.origin}/login`
+
+      await sendEmailVerification(user, {
+        url: verificationUrl,
       })
-      login(data.data.user)
-    } catch (error) {
-      console.error('Error occurred while submitting login form', error)
-      setError(error?.message)
+
+      await auth.signOut()
+      navigate('/verify-email')
+    } catch (err) {
+      console.error('Error resending verification email:', err)
+      setError(err?.message || 'Failed to resend verification email')
     } finally {
-      setIsSubmitting(false)
+      setIsResending(false)
     }
   }
 
+  const uiConfig = {
+    signInOptions: [
+      {
+        provider: EmailAuthProvider.PROVIDER_ID,
+        requireDisplayName: false,
+        signInMethod: EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD,
+      },
+    ],
+    callbacks: {
+      signInSuccessWithAuthResult: async (authResult) => {
+        try {
+          const user = authResult.user
+
+          // Check if email is verified
+          if (!user.emailVerified) {
+            setError('Please verify your email address before logging in.')
+            setShowResend(true)
+            
+            // Sign out the unverified user
+            await auth.signOut()
+            return false
+          }
+
+          // Email is verified - call backend bootstrap
+          try {
+            const response = await apiAuthFetch('/api/v1/auth/bootstrap', {
+              method: 'POST',
+            })
+
+            // Store the backend user profile
+            login(response.data.user)
+
+            // Navigate to dashboard
+            navigate('/dashboard')
+          } catch (err) {
+            console.error('Error bootstrapping user:', err)
+            setError(err?.message || 'Failed to initialize user account')
+            await auth.signOut()
+          }
+        } catch (err) {
+          console.error('Error during login:', err)
+          setError(err?.message || 'Login failed')
+        }
+
+        // Return false to prevent FirebaseUI from handling the redirect
+        return false
+      },
+      signInFailure: (error) => {
+        console.error('Login failed:', error)
+        setError(error?.message || 'Login failed')
+        setShowResend(false)
+      },
+    },
+    credentialHelper: 'none',
+    autoUpgradeAnonymousUsers: false,
+  }
+
+  const [containerRef] = useFirebaseUIWidget(auth, uiConfig)
+
   return (
     <div className='max-w-md mx-auto space-y-3'>
+      <h1 className='text-2xl font-semibold text-center'>Login</h1>
       <ErrorMessage message={error} />
-
-      <form onSubmit={handleSubmit} className='space-y-3'>
-        <div className='grid gap-1'>
-          <label htmlFor='phoneNumber' className='text-sm'>
-            Phone Number
-          </label>
-          <input
-            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-            type='text'
-            name='phoneNumber'
-            id='phoneNumber'
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
+      
+      {showResend && !isResending && (
+        <div className='text-center'>
+          <button
+            onClick={handleResendVerification}
+            className='text-sm text-blue-400 hover:text-blue-300 underline'
+          >
+            Resend verification email
+          </button>
         </div>
-
-        <button
-          className='w-full rounded border border-slate-700/50 px-3 py-2 text-sm'
-          type='submit'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Logging up...' : 'Login'}
-        </button>
-      </form>
+      )}
+      
+      {isResending && (
+        <p className='text-sm text-center text-slate-400'>
+          Sending verification email...
+        </p>
+      )}
+      
+      <div ref={containerRef} />
     </div>
   )
 }

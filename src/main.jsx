@@ -7,6 +7,7 @@ import {
   Home,
   Signup,
   Login,
+  VerifyEmail,
   Dashboard,
   MonthlyExpenses,
   DailyExpenses,
@@ -34,6 +35,7 @@ createRoot(root).render(
             <Route element={<AuthLayout authenticationRequired={false} />}>
               <Route path='/signup' element={<Signup />} />
               <Route path='/login' element={<Login />} />
+              <Route path='/verify-email' element={<VerifyEmail />} />
             </Route>
 
             {/* Private routes */}
