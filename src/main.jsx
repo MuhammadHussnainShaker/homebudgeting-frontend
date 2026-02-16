@@ -11,6 +11,7 @@ import {
   MonthlyExpenses,
   DailyExpenses,
   UserProfile,
+  VerifyEmail,
 } from '@/pages/index.js'
 import { AuthLayout } from '@/components/index.js'
 import { FirebaseUIProvider } from '@firebase-oss/ui-react'
@@ -31,6 +32,9 @@ createRoot(root).render(
               <Route path='/signup' element={<Signup />} />
               <Route path='/login' element={<Login />} />
             </Route>
+
+            {/* Email verification route */}
+            <Route path='/verify-email' element={<VerifyEmail />} />
 
             {/* Private routes */}
             <Route element={<AuthLayout authenticationRequired={true} />}>

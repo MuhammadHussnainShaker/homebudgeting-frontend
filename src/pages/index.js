@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Dashboard'
 import MonthlyExpenses from '@/pages/MonthlyExpenses'
 import DailyExpenses from '@/pages/DailyExpenses'
 import UserProfile from '@/pages/UserProfile'
+import VerifyEmail from '@/pages/VerifyEmail'
 
 export {
   Home,
@@ -14,4 +15,5 @@ export {
   MonthlyExpenses,
   DailyExpenses,
   UserProfile,
+  VerifyEmail,
 }

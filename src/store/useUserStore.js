@@ -29,6 +29,7 @@ const useUserStore = create()(
               userData: {
                 _id: state.user.userData._id,
                 displayName: state.user.userData.displayName,
+                email: state.user.userData.email,
                 isActive: state.user.userData.isActive,
               },
             }

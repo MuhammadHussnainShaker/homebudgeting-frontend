@@ -1,13 +1,16 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '@/services/firebase/firebaseClient'
 import useUserStore from '@/store/useUserStore'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { apiFetch } from '@/utils/apiFetch'
 
 export default function Login() {
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const login = useUserStore((state) => state.login)
+  const navigate = useNavigate()
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -15,11 +18,17 @@ export default function Login() {
     setError('')
 
     try {
-      const data = await apiFetch('/api/v1/users/login', {
-        method: 'POST',
-        body: JSON.stringify({ phoneNumber }),
-      })
-      login(data.data.user)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // Check if email is verified
+      if (!userCredential.user.emailVerified) {
+        setError('Please verify your email before logging in.')
+        await auth.signOut()
+        navigate('/verify-email')
+        return
+      }
+      
+      // User is verified, AuthLayout will handle navigation
     } catch (error) {
       console.error('Error occurred while submitting login form', error)
       setError(error?.message)
@@ -34,16 +43,32 @@ export default function Login() {
 
       <form onSubmit={handleSubmit} className='space-y-3'>
         <div className='grid gap-1'>
-          <label htmlFor='phoneNumber' className='text-sm'>
-            Phone Number
+          <label htmlFor='email' className='text-sm'>
+            Email
           </label>
           <input
             className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-            type='text'
-            name='phoneNumber'
-            id='phoneNumber'
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            type='email'
+            name='email'
+            id='email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={isSubmitting}
+          />
+        </div>
+
+        <div className='grid gap-1'>
+          <label htmlFor='password' className='text-sm'>
+            Password
+          </label>
+          <input
+            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
+            type='password'
+            name='password'
+            id='password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             disabled={isSubmitting}
           />
