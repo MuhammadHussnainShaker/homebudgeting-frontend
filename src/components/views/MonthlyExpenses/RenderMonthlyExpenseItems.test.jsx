@@ -62,6 +62,8 @@ describe('RenderMonthlyExpenseItems', () => {
     expect(screen.getByText('Projected: 1000')).toBeInTheDocument()
     expect(screen.getByText('Actual: 900')).toBeInTheDocument()
     expect(screen.getByText('Difference: 100')).toBeInTheDocument()
+    // Verify selectable checkbox is NOT rendered in the UI
+    expect(screen.queryByRole('checkbox', { name: /selectable/i })).not.toBeInTheDocument()
   })
 
   it('renders no expenses message when category has no expenses', () => {
@@ -139,6 +141,8 @@ describe('RenderMonthlyExpenseItems', () => {
     expect(screen.getByDisplayValue('Transport')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Rent')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Fuel')).toBeInTheDocument()
+    // Verify selectable checkbox is NOT rendered in the UI
+    expect(screen.queryByRole('checkbox', { name: /selectable/i })).not.toBeInTheDocument()
   })
 
   it('filters expenses correctly by parentId', () => {
@@ -221,5 +225,41 @@ describe('RenderMonthlyExpenseItems', () => {
     expect(screen.getByText('Projected: 0')).toBeInTheDocument()
     expect(screen.getByText('Actual: 0')).toBeInTheDocument()
     expect(screen.getByText('Difference: 0')).toBeInTheDocument()
+  })
+
+  it('does not render selectable checkbox in the UI', () => {
+    const parentCategories = [{ _id: 'p1', description: 'Housing' }]
+    const monthlyCatExpenses = [
+      {
+        _id: 'm1',
+        parentId: 'p1',
+        description: 'Rent',
+        projectedAmount: 1000,
+        actualAmount: 900,
+        selectable: true,
+      },
+    ]
+    const totals = {
+      byParent: {
+        p1: { projectedTotal: 1000, actualTotal: 900, difference: 100 },
+      },
+      grand: {},
+    }
+
+    render(
+      <RenderMonthlyExpenseItems
+        parentCategories={parentCategories}
+        monthlyCatExpenses={monthlyCatExpenses}
+        totals={totals}
+        toggleSelectableFn={mockToggleSelectable}
+        deleteMonthlyCategoricalExpense={mockDelete}
+        updateMonthlyCategoricalExpense={mockUpdate}
+        createMonthlyCategoricalExpenses={mockCreate}
+      />,
+    )
+
+    // The selectable checkbox should NOT be rendered in the UI
+    expect(screen.queryByRole('checkbox', { name: /selectable/i })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/selectable/i)).not.toBeInTheDocument()
   })
 })
