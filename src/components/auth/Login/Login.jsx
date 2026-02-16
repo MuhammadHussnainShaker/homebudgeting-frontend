@@ -21,8 +21,12 @@ export default function Login() {
       
       // Check if email is verified
       if (!userCredential.user.emailVerified) {
+        try {
+          await auth.signOut()
+        } catch (signOutError) {
+          console.error('Error signing out unverified user:', signOutError)
+        }
         setError('Please verify your email before logging in.')
-        await auth.signOut()
         navigate('/verify-email')
         return
       }

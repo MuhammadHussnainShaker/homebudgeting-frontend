@@ -11,7 +11,11 @@ export default function Protected({ authenticationRequired = true }) {
   const logout = useUserStore((state) => state.logout)
 
   useEffect(() => {
+    let isMounted = true
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!isMounted) return
+      
       if (user && user.emailVerified) {
         // User is signed in and email is verified
         login({
@@ -44,7 +48,10 @@ export default function Protected({ authenticationRequired = true }) {
       }
     })
 
-    return () => unsubscribe()
+    return () => {
+      isMounted = false
+      unsubscribe()
+    }
   }, [authenticationRequired, navigate, login, logout])
 
   if (isLoading) {
