@@ -1,6 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
+import { onAuthStateChanged } from 'firebase/auth'
 import useUserStore from '@/store/useUserStore'
 import AuthLayout from '@/components/auth/AuthLayout'
 
@@ -8,7 +9,7 @@ describe('AuthLayout', () => {
   beforeEach(() => {
     localStorage.clear()
     useUserStore.setState({ user: { isAuthenticated: false, userData: null } })
-    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -16,26 +17,10 @@ describe('AuthLayout', () => {
   })
 
   it('redirects unauthenticated users to login', async () => {
-    render(
-      <MemoryRouter initialEntries={['/protected']}>
-        <Routes>
-          <Route element={<AuthLayout authenticationRequired={true} />}>
-            <Route path='/protected' element={<div>Protected</div>} />
-          </Route>
-          <Route path='/login' element={<div>Login Page</div>} />
-        </Routes>
-      </MemoryRouter>,
-    )
-
-    expect(await screen.findByText('Login Page')).toBeInTheDocument()
-  })
-
-  it('renders protected content for authenticated users', async () => {
-    useUserStore.setState({
-      user: {
-        isAuthenticated: true,
-        userData: { _id: 'u1', displayName: 'Ali', isActive: true },
-      },
+    // Mock onAuthStateChanged to call callback with null user
+    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
+      callback(null)
+      return vi.fn()
     })
 
     render(
@@ -49,15 +34,51 @@ describe('AuthLayout', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByText('Protected')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Login Page')).toBeInTheDocument()
+    })
+  })
+
+  it('renders protected content for authenticated users with verified email', async () => {
+    const mockUser = {
+      uid: 'u1',
+      displayName: 'Ali',
+      email: 'ali@example.com',
+      emailVerified: true,
+    }
+
+    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
+      callback(mockUser)
+      return vi.fn()
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/protected']}>
+        <Routes>
+          <Route element={<AuthLayout authenticationRequired={true} />}>
+            <Route path='/protected' element={<div>Protected</div>} />
+          </Route>
+          <Route path='/login' element={<div>Login Page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Protected')).toBeInTheDocument()
+    })
   })
 
   it('redirects authenticated users to dashboard on public routes', async () => {
-    useUserStore.setState({
-      user: {
-        isAuthenticated: true,
-        userData: { _id: 'u1', displayName: 'Ali', isActive: true },
-      },
+    const mockUser = {
+      uid: 'u1',
+      displayName: 'Ali',
+      email: 'ali@example.com',
+      emailVerified: true,
+    }
+
+    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
+      callback(mockUser)
+      return vi.fn()
     })
 
     render(
@@ -71,6 +92,37 @@ describe('AuthLayout', () => {
       </MemoryRouter>,
     )
 
-    expect(await screen.findByText('Dashboard Page')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('Dashboard Page')).toBeInTheDocument()
+    })
+  })
+
+  it('redirects users with unverified email to verify-email page', async () => {
+    const mockUser = {
+      uid: 'u1',
+      displayName: 'Ali',
+      email: 'ali@example.com',
+      emailVerified: false,
+    }
+
+    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
+      callback(mockUser)
+      return vi.fn()
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/protected']}>
+        <Routes>
+          <Route element={<AuthLayout authenticationRequired={true} />}>
+            <Route path='/protected' element={<div>Protected</div>} />
+          </Route>
+          <Route path='/verify-email' element={<div>Verify Email Page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Verify Email Page')).toBeInTheDocument()
+    })
   })
 })

@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '@/services/firebase/firebaseClient'
 import useUserStore from '@/store/useUserStore'
 import Login from '@/components/auth/Login/Login'
 
@@ -10,62 +13,94 @@ describe('Login', () => {
   })
 
   afterEach(() => {
-    vi.unstubAllGlobals()
+    vi.clearAllMocks()
   })
 
-  it('submits login data and stores user on success', async () => {
-    const user = { _id: 'u1', displayName: 'Ali', isActive: true }
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      headers: {
-        get: vi.fn().mockReturnValue('application/json'),
-      },
-      json: vi.fn().mockResolvedValue({ success: true, data: { user } }),
+  it('submits login data for verified user', async () => {
+    const mockUser = {
+      uid: 'u1',
+      displayName: 'Ali',
+      email: 'ali@example.com',
+      emailVerified: true,
+    }
+
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+      user: mockUser,
     })
-    vi.stubGlobal('fetch', fetchMock)
 
-    render(<Login />)
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    )
 
-    fireEvent.change(screen.getByLabelText(/phone number/i), {
-      target: { value: '03001234567' },
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'ali@example.com' },
+    })
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: 'password123' },
     })
     fireEvent.click(screen.getByRole('button', { name: /login/i }))
 
-    await waitFor(() =>
-      expect(useUserStore.getState().user.userData).toEqual(user),
-    )
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/v1/users/login',
-      expect.objectContaining({
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: '03001234567' }),
-      }),
-    )
+    await waitFor(() => {
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
+        auth,
+        'ali@example.com',
+        'password123'
+      )
+    })
   }, 10000)
 
-  it('renders API error message on failure', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: false,
-      headers: {
-        get: vi.fn().mockReturnValue('application/json'),
-      },
-      text: vi.fn().mockResolvedValue(JSON.stringify({
-        success: false,
-        message: 'Invalid credentials',
-      })),
+  it('renders error message for unverified email', async () => {
+    const mockUser = {
+      uid: 'u1',
+      displayName: 'Ali',
+      email: 'ali@example.com',
+      emailVerified: false,
+    }
+
+    vi.mocked(signInWithEmailAndPassword).mockResolvedValue({
+      user: mockUser,
     })
-    vi.stubGlobal('fetch', fetchMock)
 
-    render(<Login />)
+    auth.signOut = vi.fn().mockResolvedValue()
 
-    fireEvent.change(screen.getByLabelText(/phone number/i), {
-      target: { value: '03001234567' },
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    )
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'ali@example.com' },
+    })
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: 'password123' },
     })
     fireEvent.click(screen.getByRole('button', { name: /login/i }))
 
-    expect(await screen.findByText('Invalid credentials')).toBeInTheDocument()
+    expect(await screen.findByText(/Please verify your email/i)).toBeInTheDocument()
+  })
+
+  it('renders error message on failure', async () => {
+    vi.mocked(signInWithEmailAndPassword).mockRejectedValue(
+      new Error('Invalid credentials')
+    )
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    )
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'ali@example.com' },
+    })
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: 'wrongpassword' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /login/i }))
+
+    expect(await screen.findByText(/Invalid credentials/i)).toBeInTheDocument()
   })
 })
