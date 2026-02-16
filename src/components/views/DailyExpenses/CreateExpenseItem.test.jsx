@@ -14,10 +14,7 @@ describe('CreateExpenseItem', () => {
   it('submits description on blur and clears the input', async () => {
     const createRecordFn = vi.fn().mockResolvedValue()
     render(
-      <CreateExpenseItem
-        createRecordFn={createRecordFn}
-        date='2026-02-01'
-      />,
+      <CreateExpenseItem createRecordFn={createRecordFn} date='2026-02-01' />,
     )
 
     fireEvent.change(screen.getByLabelText(/new item description/i), {
@@ -32,7 +29,9 @@ describe('CreateExpenseItem', () => {
       }),
     )
 
-    expect(screen.getByLabelText(/new item description/i)).toHaveValue('')
+    await waitFor(() =>
+      expect(screen.getByLabelText(/new item description/i)).toHaveValue(''),
+    )
   })
 
   it('clears the input on escape without submitting', () => {
@@ -60,6 +59,8 @@ describe('CreateExpenseItem', () => {
     fireEvent.blur(screen.getByLabelText(/new item description/i))
 
     await waitFor(() => expect(alert).toHaveBeenCalled())
-    expect(screen.getByLabelText(/new item description/i)).toHaveValue('Groceries')
+    expect(screen.getByLabelText(/new item description/i)).toHaveValue(
+      'Groceries',
+    )
   })
 })
