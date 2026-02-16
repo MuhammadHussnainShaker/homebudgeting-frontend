@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/services/firebase/firebaseClient'
-import useUserStore from '@/store/useUserStore'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 
 export default function Login() {

@@ -9,7 +9,6 @@ export default function Protected({ authenticationRequired = true }) {
   const navigate = useNavigate()
   const login = useUserStore((state) => state.login)
   const logout = useUserStore((state) => state.logout)
-  const isAuthenticated = useUserStore((state) => state.user.isAuthenticated)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
