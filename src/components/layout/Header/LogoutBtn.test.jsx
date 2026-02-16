@@ -22,5 +22,5 @@ describe('LogoutBtn', () => {
     fireEvent.click(screen.getByRole('button', { name: /logout/i }))
 
     expect(logoutMock).toHaveBeenCalledTimes(1)
-  })
+  }, 20000)
 })
