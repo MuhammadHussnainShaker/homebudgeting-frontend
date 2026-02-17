@@ -6,9 +6,7 @@ export default function LogoutBtn() {
 
   const handleLogout = async () => {
     try {
-      // Sign out from Firebase
       await auth.signOut()
-      // Clear Zustand state
       logout()
     } catch (error) {
       console.error('Error during logout:', error)

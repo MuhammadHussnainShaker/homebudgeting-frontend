@@ -16,10 +16,6 @@ import {
 import { AuthLayout } from '@/components/index.js'
 import { FirebaseUIProvider } from '@firebase-oss/ui-react'
 import { ui } from '@/services/firebase/firebaseClient'
-import { initializeAuthListener } from '@/services/firebase/authListener'
-
-// Initialize Firebase auth state listener
-initializeAuthListener()
 
 const root = document.getElementById('root')
 

@@ -18,5 +18,4 @@ export const ui = initializeUI({
   app,
 })
 export const auth = getAuth(app)
-// eslint-disable-next-line no-unused-vars
 const analytics = getAnalytics(app)

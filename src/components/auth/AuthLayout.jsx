@@ -3,49 +3,23 @@ import { Outlet, useNavigate } from 'react-router'
 import useUserStore from '@/store/useUserStore'
 
 export default function Protected({ authenticationRequired = true }) {
-  const firebaseUser = useUserStore((state) => state.firebaseUser)
-  const loading = useUserStore((state) => state.loading)
-  const isAuthenticated = useUserStore((state) => state.user.isAuthenticated)
-  const [isLoading, setIsLoading] = useState(true)
+  const isAuthenticated = useUserStore((s) => s.user.isAuthenticated)
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Wait for Firebase auth to initialize
-    if (loading) {
-      return
-    }
-
-    if (authenticationRequired) {
-      // For protected routes, check Firebase auth and email verification
-      if (!firebaseUser) {
-        // Not signed in with Firebase - redirect to login
-        navigate('/login')
-      } else if (!firebaseUser.emailVerified) {
-        // Firebase user exists but email not verified - redirect to verify page
-        navigate('/verify-email')
-      } else if (!isAuthenticated) {
-        // Email verified but no backend user - redirect to login to trigger bootstrap
-        navigate('/login')
-      } else {
-        // All checks passed - allow access
-        setIsLoading(false)
-      }
+    if (authenticationRequired && !isAuthenticated) {
+      navigate('/login')
+    } else if (!authenticationRequired && isAuthenticated) {
+      navigate('/dashboard')
     } else {
-      // For public auth routes (login/signup/verify-email)
-      if (firebaseUser && firebaseUser.emailVerified && isAuthenticated) {
-        // Fully authenticated user trying to access public auth pages - redirect to dashboard
-        navigate('/dashboard')
-      } else {
-        // Allow access to public auth pages
-        setIsLoading(false)
-      }
+      setIsLoading(false)
     }
-  }, [firebaseUser, loading, isAuthenticated, authenticationRequired, navigate])
+  }, [isAuthenticated, authenticationRequired, navigate])
 
-  if (loading || isLoading) {
+  if (isLoading) {
     return <h1>Loading...</h1>
   }
 
   return <Outlet />
 }
-
