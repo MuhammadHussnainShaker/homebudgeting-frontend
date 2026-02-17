@@ -1,30 +1,76 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { SignInAuthScreen } from '@firebase-oss/ui-react'
+import { sendEmailVerification } from 'firebase/auth'
+import { auth } from '@/services/firebase/firebaseClient'
 import useUserStore from '@/store/useUserStore'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { apiFetch } from '@/utils/apiFetch'
+import { apiAuthFetch } from '@/utils/apiFetch'
 
 export default function Login() {
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [isResending, setIsResending] = useState(false)
+  const [showResend, setShowResend] = useState(false)
+  const navigate = useNavigate()
   const login = useUserStore((state) => state.login)
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setIsSubmitting(true)
+  const handleResendVerification = async () => {
+    setIsResending(true)
     setError('')
 
     try {
-      const data = await apiFetch('/api/v1/users/login', {
-        method: 'POST',
-        body: JSON.stringify({ phoneNumber }),
+      const user = auth.currentUser
+      if (!user) {
+        setError(
+          'No user is currently signed in, Please try to sign in with your email and password first',
+        )
+        return
+      }
+
+      const verificationUrl = import.meta.env.DEV
+        ? 'http://localhost:5173/login'
+        : `${window.location.origin}/login`
+
+      await sendEmailVerification(user, {
+        url: verificationUrl,
       })
-      login(data.data.user)
-    } catch (error) {
-      console.error('Error occurred while submitting login form', error)
-      setError(error?.message)
+
+      navigate('/verify-email')
+    } catch (err) {
+      console.error('Error resending verification email:', err)
+      setError(err?.message || 'Failed to resend verification email')
     } finally {
-      setIsSubmitting(false)
+      setIsResending(false)
+    }
+  }
+
+  const handleSignIn = async (user) => {
+    try {
+      const isEmailVerified = user.emailVerified
+
+      if (!isEmailVerified) {
+        setError(
+          'Please verify your email address before logging in. Check your inbox for the verification link.',
+        )
+        setShowResend(true)
+        return
+      }
+
+      try {
+        const response = await apiAuthFetch('/api/v1/auth/bootstrap', {
+          method: 'POST',
+        })
+
+        login(response.data.user)
+
+        navigate('/dashboard')
+      } catch (err) {
+        console.error('Error bootstrapping user:', err)
+        setError(err?.message || 'Failed to initialize user account')
+      }
+    } catch (err) {
+      console.error('Error during login:', err)
+      setError(err?.message || 'Login failed')
     }
   }
 
@@ -32,31 +78,27 @@ export default function Login() {
     <div className='max-w-md mx-auto space-y-3'>
       <ErrorMessage message={error} />
 
-      <form onSubmit={handleSubmit} className='space-y-3'>
-        <div className='grid gap-1'>
-          <label htmlFor='phoneNumber' className='text-sm'>
-            Phone Number
-          </label>
-          <input
-            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-            type='text'
-            name='phoneNumber'
-            id='phoneNumber'
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
+      {showResend && !isResending && (
+        <div className='text-center'>
+          <button
+            onClick={handleResendVerification}
+            className='text-sm text-blue-400 hover:text-blue-300 underline'
+          >
+            Resend verification email
+          </button>
         </div>
+      )}
 
-        <button
-          className='w-full rounded border border-slate-700/50 px-3 py-2 text-sm'
-          type='submit'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Logging up...' : 'Login'}
-        </button>
-      </form>
+      {isResending && (
+        <p className='text-sm text-center text-slate-400'>
+          Sending verification email...
+        </p>
+      )}
+
+      <SignInAuthScreen
+        onSignIn={handleSignIn}
+        onForgotPasswordClick={() => navigate('/forgot-password')}
+      />
     </div>
   )
 }

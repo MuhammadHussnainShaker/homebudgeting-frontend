@@ -1,79 +1,47 @@
 import { useState } from 'react'
-import useUserStore from '@/store/useUserStore'
+import { useNavigate } from 'react-router'
+import { SignUpAuthScreen } from '@firebase-oss/ui-react'
+import { sendEmailVerification } from 'firebase/auth'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { apiFetch } from '@/utils/apiFetch'
 
 export default function Signup() {
-  const [displayName, setDisplayName] = useState('')
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const login = useUserStore((state) => state.login)
+  const navigate = useNavigate()
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError('')
+  const handleSignUp = async (user) => {
+    const createdAt = new Date(user.metadata.creationTime).getTime()
+    const now = new Date().getTime()
 
+    // Only send email if the account was created in the last 10 seconds
+    const isNewAccount = now - createdAt < 10000
+
+    if (!isNewAccount) {
+      console.log('Restored session detected. Skipping auto-email.')
+      return
+    }
     try {
-      const data = await apiFetch('/api/v1/users/register', {
-        method: 'POST',
-        body: JSON.stringify({ displayName, phoneNumber }),
+      const verificationUrl = import.meta.env.DEV
+        ? 'http://localhost:5173/login'
+        : `${window.location.origin}/login`
+
+      await sendEmailVerification(user, {
+        url: verificationUrl,
       })
-      login(data.data.user)
-    } catch (error) {
-      console.error('Error occurred while submitting signup form', error)
-      setError(error?.message)
-    } finally {
-      setIsSubmitting(false)
+
+      // // Sign out the user immediately after signup -> No need TODO: delete it
+      // await auth.signOut()
+
+      navigate('/verify-email')
+    } catch (err) {
+      console.error('Error during signup:', err)
+      setError(err?.message || 'Failed to send verification email')
     }
   }
 
   return (
     <div className='max-w-md mx-auto space-y-3'>
       <ErrorMessage message={error} />
-
-      <form onSubmit={handleSubmit} className='space-y-3'>
-        <div className='grid gap-1'>
-          <label htmlFor='displayName' className='text-sm'>
-            Name
-          </label>
-          <input
-            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-            type='text'
-            name='displayName'
-            id='displayName'
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div className='grid gap-1'>
-          <label htmlFor='phoneNumber' className='text-sm'>
-            Phone Number
-          </label>
-          <input
-            className='rounded border border-slate-700/50 bg-transparent px-2 py-1 text-sm'
-            type='text'
-            name='phoneNumber'
-            id='phoneNumber'
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            required
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <button
-          className='w-full rounded border border-slate-700/50 px-3 py-2 text-sm'
-          type='submit'
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Signing up...' : 'Signup'}
-        </button>
-      </form>
+      <SignUpAuthScreen onSignUp={handleSignUp} />
     </div>
   )
 }

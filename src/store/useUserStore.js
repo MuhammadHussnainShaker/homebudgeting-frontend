@@ -1,14 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-// const demoUser = {
-//   isAuthenticated: false,
-//   userData: {
-//     phoneNumber: '0303123456',
-//     displayName: 'Name',
-//   },
-// }
-
 const useUserStore = create()(
   persist(
     (set) => ({

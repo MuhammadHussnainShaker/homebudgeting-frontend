@@ -1,71 +1,37 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 import useUserStore from '@/store/useUserStore'
 import Login from '@/components/auth/Login/Login'
+
+// Mock useNavigate
+const mockNavigate = vi.fn()
+vi.mock('react-router', async () => {
+  const actual = await vi.importActual('react-router')
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 
 describe('Login', () => {
   beforeEach(() => {
     localStorage.clear()
-    useUserStore.setState({ user: { isAuthenticated: false, userData: null } })
+    useUserStore.setState({
+      firebaseUser: null,
+      loading: false,
+      user: { isAuthenticated: false, userData: null },
+    })
+    mockNavigate.mockClear()
   })
 
-  afterEach(() => {
-    vi.unstubAllGlobals()
-  })
-
-  it('submits login data and stores user on success', async () => {
-    const user = { _id: 'u1', displayName: 'Ali', isActive: true }
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      headers: {
-        get: vi.fn().mockReturnValue('application/json'),
-      },
-      json: vi.fn().mockResolvedValue({ success: true, data: { user } }),
-    })
-    vi.stubGlobal('fetch', fetchMock)
-
-    render(<Login />)
-
-    fireEvent.change(screen.getByLabelText(/phone number/i), {
-      target: { value: '03001234567' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: /login/i }))
-
-    await waitFor(() =>
-      expect(useUserStore.getState().user.userData).toEqual(user),
+  it('renders login form with FirebaseUI', () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>,
     )
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/v1/users/login',
-      expect.objectContaining({
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber: '03001234567' }),
-      }),
-    )
-  }, 10000)
-
-  it('renders API error message on failure', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: false,
-      headers: {
-        get: vi.fn().mockReturnValue('application/json'),
-      },
-      text: vi.fn().mockResolvedValue(JSON.stringify({
-        success: false,
-        message: 'Invalid credentials',
-      })),
-    })
-    vi.stubGlobal('fetch', fetchMock)
-
-    render(<Login />)
-
-    fireEvent.change(screen.getByLabelText(/phone number/i), {
-      target: { value: '03001234567' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: /login/i }))
-
-    expect(await screen.findByText('Invalid credentials')).toBeInTheDocument()
+    expect(screen.getByTestId('signin-screen')).toBeInTheDocument()
   })
 })
