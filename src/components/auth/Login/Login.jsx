@@ -95,7 +95,10 @@ export default function Login() {
         </p>
       )}
 
-      <SignInAuthScreen onSignIn={handleSignIn} />
+      <SignInAuthScreen
+        onSignIn={handleSignIn}
+        onForgotPasswordClick={() => navigate('/forgot-password')}
+      />
     </div>
   )
 }
