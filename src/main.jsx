@@ -8,6 +8,7 @@ import {
   Signup,
   Login,
   VerifyEmail,
+  ForgotPassword,
   Dashboard,
   MonthlyExpenses,
   DailyExpenses,
@@ -32,6 +33,7 @@ createRoot(root).render(
               <Route path='/signup' element={<Signup />} />
               <Route path='/login' element={<Login />} />
               <Route path='/verify-email' element={<VerifyEmail />} />
+              <Route path='/forgot-password' element={<ForgotPassword />} />
             </Route>
 
             {/* Private routes */}
