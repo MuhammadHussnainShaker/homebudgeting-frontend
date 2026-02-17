@@ -32,6 +32,6 @@ describe('Signup', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText(/sign up/i)).toBeInTheDocument()
+    expect(screen.getByTestId('signup-screen')).toBeInTheDocument()
   })
 })
