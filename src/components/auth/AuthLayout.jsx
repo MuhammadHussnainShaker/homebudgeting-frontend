@@ -4,7 +4,7 @@ import useUserStore from '@/store/useUserStore'
 
 export default function Protected({ authenticationRequired = true }) {
   const isAuthenticated = useUserStore((s) => s.user.isAuthenticated)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {
