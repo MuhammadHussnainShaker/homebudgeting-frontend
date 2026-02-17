@@ -1,5 +1,6 @@
 import AuthLayout from '@/components/auth/AuthLayout'
 import Signup from '@/components/auth/Signup/Signup'
+import VerifyEmail from '@/components/auth/VerifyEmail/VerifyEmail'
 import Login from '@/components/auth/Login/Login'
 import Container from '@/components/layout/container/Container'
 import Header from '@/components/layout/Header/Header'
@@ -14,10 +15,11 @@ import { CreateDataItem } from '@/components/data-items'
 export {
   AuthLayout,
   Signup,
+  VerifyEmail,
+  Login,
   Container,
   Header,
   Footer,
-  Login,
   Incomes,
   Savings,
   MonthlyExpenses,

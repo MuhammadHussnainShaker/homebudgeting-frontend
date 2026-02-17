@@ -7,7 +7,11 @@ import AuthLayout from '@/components/auth/AuthLayout'
 describe('AuthLayout', () => {
   beforeEach(() => {
     localStorage.clear()
-    useUserStore.setState({ user: { isAuthenticated: false, userData: null } })
+    useUserStore.setState({
+      firebaseUser: null,
+      loading: false,
+      user: { isAuthenticated: false, userData: null },
+    })
     vi.spyOn(console, 'log').mockImplementation(() => {})
   })
 
@@ -16,6 +20,12 @@ describe('AuthLayout', () => {
   })
 
   it('redirects unauthenticated users to login', async () => {
+    useUserStore.setState({
+      firebaseUser: null,
+      loading: false,
+      user: { isAuthenticated: false, userData: null },
+    })
+
     render(
       <MemoryRouter initialEntries={['/protected']}>
         <Routes>
@@ -30,8 +40,31 @@ describe('AuthLayout', () => {
     expect(await screen.findByText('Login Page')).toBeInTheDocument()
   })
 
-  it('renders protected content for authenticated users', async () => {
+  it('redirects unverified users to verify-email page', async () => {
     useUserStore.setState({
+      firebaseUser: { emailVerified: false },
+      loading: false,
+      user: { isAuthenticated: false, userData: null },
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/protected']}>
+        <Routes>
+          <Route element={<AuthLayout authenticationRequired={true} />}>
+            <Route path='/protected' element={<div>Protected</div>} />
+          </Route>
+          <Route path='/verify-email' element={<div>Verify Email Page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('Verify Email Page')).toBeInTheDocument()
+  })
+
+  it('renders protected content for verified authenticated users', async () => {
+    useUserStore.setState({
+      firebaseUser: { emailVerified: true },
+      loading: false,
       user: {
         isAuthenticated: true,
         userData: { _id: 'u1', displayName: 'Ali', isActive: true },
@@ -54,6 +87,8 @@ describe('AuthLayout', () => {
 
   it('redirects authenticated users to dashboard on public routes', async () => {
     useUserStore.setState({
+      firebaseUser: { emailVerified: true },
+      loading: false,
       user: {
         isAuthenticated: true,
         userData: { _id: 'u1', displayName: 'Ali', isActive: true },
